@@ -5,7 +5,7 @@ import faunadb, { query as q } from "faunadb";
 
 function App() {
   var client = new faunadb.Client({
-    secret: process.env.fauna_secret || "",
+    secret: process.env.react_app_fauna_secret || "",
   });
 
   client
