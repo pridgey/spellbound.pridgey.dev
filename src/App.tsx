@@ -1,5 +1,7 @@
-import React from "react";
+import React, { Suspense } from "react";
 import faunadb, { query as q } from "faunadb";
+import { BrowserRouter } from "react-router-dom";
+import { AuthenticatedRoutes } from "./utilities/routes";
 
 function App() {
   var client = new faunadb.Client({
@@ -13,7 +15,11 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header"></header>
+      <BrowserRouter>
+        <Suspense fallback={<div>Loading</div>}>
+          <AuthenticatedRoutes />
+        </Suspense>
+      </BrowserRouter>
     </div>
   );
 }
