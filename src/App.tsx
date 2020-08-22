@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import { Screenloader } from "./components/screenloader/screenloader";
 import firebase from "firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { ThemeProvider } from "styled-components";
+import { getTheme } from "./utilities";
 
 firebase.initializeApp({
   apiKey: process.env.react_app_firebase_key,
@@ -37,11 +39,13 @@ function App() {
 
   return (
     <div className="App">
-      <BrowserRouter>
-        <Suspense fallback={<Screenloader />}>
-          {user?.uid ? <AuthenticatedRoutes /> : <UnauthenticatedRoutes />}
-        </Suspense>
-      </BrowserRouter>
+      <ThemeProvider theme={getTheme()}>
+        <BrowserRouter>
+          <Suspense fallback={<Screenloader />}>
+            {user?.uid ? <AuthenticatedRoutes /> : <UnauthenticatedRoutes />}
+          </Suspense>
+        </BrowserRouter>
+      </ThemeProvider>
     </div>
   );
 }
