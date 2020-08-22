@@ -1,15 +1,15 @@
 import React, { lazy } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 
-const About = lazy(() => import("../../components/about"));
-const Home = lazy(() => import("../../components/home"));
+const Screenloader = lazy(() => import("../../components/screenloader"));
 
-export const AuthenticatedRoutes = () => {
+const AuthenticatedRoutes = () => {
   return (
     <Switch>
-      <Route exact path="/about" component={About} />
-      <Route exact path="/" component={Home} />
-      <Redirect to="/" />
+      <Route exact path="/test/" component={Screenloader} />
+      <Redirect to="/test" />
     </Switch>
   );
 };
+
+export default AuthenticatedRoutes;

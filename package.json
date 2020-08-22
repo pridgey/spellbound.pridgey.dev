@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@pridgey/loader-fireball": "^1.0.10",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -11,11 +12,16 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "@types/react-router-dom": "^5.1.5",
+    "@types/styled-components": "^5.1.2",
     "faunadb": "^2.14.2",
+    "firebase": "^7.18.0",
+    "midori-bg": "^0.6.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-firebase-hooks": "^2.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "styled-components": "^5.1.1",
     "typescript": "~3.8.3"
   },
   "scripts": {
