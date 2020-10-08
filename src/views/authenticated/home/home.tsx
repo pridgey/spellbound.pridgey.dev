@@ -34,6 +34,7 @@ export const Home = () => {
 
   useEffect(() => {
     retrieveCampaigns();
+    // eslint-disable-next-line
   }, []);
 
   return (

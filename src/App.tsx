@@ -1,5 +1,4 @@
 import React, { Suspense, lazy } from "react";
-import faunadb, { query as q } from "faunadb";
 import { BrowserRouter } from "react-router-dom";
 import { Screenloader } from "./components/screenloader/screenloader";
 import firebase from "firebase";
@@ -27,15 +26,6 @@ const AuthenticatedRoutes = lazy(
 
 function App() {
   const [user] = useAuthState(firebase.auth());
-
-  var client = new faunadb.Client({
-    secret: process.env.react_app_fauna_secret || "",
-  });
-
-  client
-    .query(q.Get(q.Collection("campaign")))
-    .then((ret: any) => console.log(ret))
-    .catch((issue) => console.log("uhoh", issue));
 
   return (
     <div className="App">
