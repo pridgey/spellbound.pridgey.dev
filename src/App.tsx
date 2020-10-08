@@ -5,7 +5,7 @@ import { Screenloader } from "./components/screenloader/screenloader";
 import firebase from "firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { ThemeProvider } from "styled-components";
-import { getTheme } from "./utilities";
+import { getTheme, AirtableProvider } from "./utilities";
 
 firebase.initializeApp({
   apiKey: process.env.react_app_firebase_key,
@@ -18,11 +18,11 @@ firebase.initializeApp({
   measurementId: "G-Z2NYH4N046",
 });
 
-const UnauthenticatedRoutes = lazy(() =>
-  import("./utilities/routes/unauthenticatedRoutes")
+const UnauthenticatedRoutes = lazy(
+  () => import("./utilities/routes/unauthenticatedRoutes")
 );
-const AuthenticatedRoutes = lazy(() =>
-  import("./utilities/routes/authenticatedRoutes")
+const AuthenticatedRoutes = lazy(
+  () => import("./utilities/routes/authenticatedRoutes")
 );
 
 function App() {
@@ -33,19 +33,21 @@ function App() {
   });
 
   client
-    .query(q.Get(q.Ref(q.Collection("gametable"), "273705832001045004")))
-    .then((ret: any) => console.log(ret?.data?.test))
+    .query(q.Get(q.Collection("campaign")))
+    .then((ret: any) => console.log(ret))
     .catch((issue) => console.log("uhoh", issue));
 
   return (
     <div className="App">
-      <ThemeProvider theme={getTheme()}>
-        <BrowserRouter>
-          <Suspense fallback={<Screenloader />}>
-            {user?.uid ? <AuthenticatedRoutes /> : <UnauthenticatedRoutes />}
-          </Suspense>
-        </BrowserRouter>
-      </ThemeProvider>
+      <AirtableProvider>
+        <ThemeProvider theme={getTheme()}>
+          <BrowserRouter>
+            <Suspense fallback={<Screenloader />}>
+              {user?.uid ? <AuthenticatedRoutes /> : <UnauthenticatedRoutes />}
+            </Suspense>
+          </BrowserRouter>
+        </ThemeProvider>
+      </AirtableProvider>
     </div>
   );
 }

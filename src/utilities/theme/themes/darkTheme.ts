@@ -1,13 +1,29 @@
-import { convertColorToCSS } from "./convertColorToCSS";
+import { convertColorToCSS } from "../convertColorToCSS";
 
-export const DarkTheme = new Proxy(
-  {
+export class DarkTheme {
+  Colors: {
+    [key: string]: {
+      hue: number;
+      saturation: number;
+      lightness: number;
+    };
+  } = {
     background: {
       hue: 60,
       saturation: 1,
       lightness: 14,
     },
     foreground: {
+      hue: 46,
+      saturation: 100,
+      lightness: 97,
+    },
+    black: {
+      hue: 60,
+      saturation: 1,
+      lightness: 14,
+    },
+    white: {
       hue: 46,
       saturation: 100,
       lightness: 97,
@@ -52,12 +68,12 @@ export const DarkTheme = new Proxy(
       saturation: 2,
       lightness: 64,
     },
-  },
-  {
-    get: (obj, prop) => {
-      return prop in obj
-        ? convertColorToCSS(obj[prop])
-        : convertColorToCSS(obj.blue);
-    },
-  }
-);
+  };
+  getColor = (col: string): string => {
+    if (col in this.Colors) {
+      return convertColorToCSS(this.Colors[col]);
+    } else {
+      return convertColorToCSS(this.Colors.blue);
+    }
+  };
+}

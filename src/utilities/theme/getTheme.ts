@@ -1,7 +1,7 @@
 import { DarkTheme } from "./themes";
 
 export const getTheme = () => {
-  return DarkTheme;
+  return new DarkTheme();
   // const userPreference = localStorage.getItem("spellbound-theme-pref");
   //   let resultingTheme: Theme;
 

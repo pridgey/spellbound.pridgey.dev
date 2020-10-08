@@ -1,4 +1,4 @@
-import { convertColorToCSS } from "./convertColorToCSS";
+import { convertColorToCSS } from "../convertColorToCSS";
 
 export const lightTheme = new Proxy(
   {
