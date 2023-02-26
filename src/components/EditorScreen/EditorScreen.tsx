@@ -24,10 +24,23 @@ export const EditorScreen = () => {
   const items = [1, 2];
 
   return (
-    <div class="screen" id="editor-screen">
+    <div
+      class="screen"
+      id="editor-screen"
+      onmouseleave={(e) => {
+        for (const item of e.currentTarget.children) {
+          item.classList.remove("dragging");
+          item.removeAttribute("data-start-x");
+          item.removeAttribute("data-start-y");
+          item.removeAttribute("data-element-x");
+          item.removeAttribute("data-element-y");
+        }
+      }}
+    >
       <For each={items}>
         {(item, index) => (
           <div
+            style={{ background: `hsl(${Math.random() * 360}, 50%, 50%)` }}
             class="item"
             onmousedown={(e) => {
               const itemTarget = e.currentTarget;
@@ -91,14 +104,6 @@ export const EditorScreen = () => {
                   Math.max(0, elementInitialY + mouseOffsetY)
                 )}px`;
               }
-            }}
-            onmouseleave={(e) => {
-              const itemTarget = e.currentTarget;
-              itemTarget.classList.remove("dragging");
-              itemTarget.removeAttribute("data-start-x");
-              itemTarget.removeAttribute("data-start-y");
-              itemTarget.removeAttribute("data-element-x");
-              itemTarget.removeAttribute("data-element-y");
             }}
             onmouseup={(e) => {
               const itemTarget = e.currentTarget;
