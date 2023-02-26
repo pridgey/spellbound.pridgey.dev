@@ -1,4 +1,5 @@
 import { css } from "solid-styled";
+import { EditorScreen } from "~/components";
 
 const Game = () => {
   css`
@@ -32,13 +33,14 @@ const Game = () => {
       grid-area: title;
       color: #fdfcfc;
       font-size: 8rem;
-      font-family: Srisakdi;
+      font-family: Lato, sans-serif;
       border: 0px;
       background: transparent;
       overflow: visible;
     }
 
     .title:focus {
+      outline: 0px;
       border-bottom: 1px solid #fdfcfc;
     }
 
@@ -99,7 +101,9 @@ const Game = () => {
         <div class="temp">Music</div>
         <div class="temp">Combat</div>
       </div>
-      <div class="map-container"></div>
+      <div class="map-container">
+        <EditorScreen />
+      </div>
       <aside class="sidebar"></aside>
     </main>
   );
