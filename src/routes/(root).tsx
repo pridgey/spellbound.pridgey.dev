@@ -1,8 +1,10 @@
 import { Title } from "solid-start";
 import { Outlet } from "@solidjs/router";
 import { css } from "solid-styled";
+import { useNavigate } from "solid-start";
 
 const Layout = () => {
+  const navigate = useNavigate();
   css`
     .layout {
       position: fixed;
@@ -86,7 +88,7 @@ const Layout = () => {
 
   return (
     <div class="layout">
-      <button class="box create">
+      <button class="box create" onClick={() => navigate("/game")}>
         Create <br />a game
       </button>
       <button class="box join">
