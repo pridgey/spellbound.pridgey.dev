@@ -27,6 +27,51 @@ export const EditorScreen = () => {
     <div
       class="screen"
       id="editor-screen"
+      onmousemove={(e) => {
+        const itemTarget: HTMLElement = document.getElementsByClassName(
+          "dragging"
+        )?.[0] as HTMLElement;
+
+        /* Calculates the distance the mouse has moved
+          and applies that amount to the element's initial position
+
+          Also respects the current bounds of the container
+        */
+        if (itemTarget?.classList.contains("dragging")) {
+          // Element's initial position
+          const elementInitialX =
+            Number(itemTarget.getAttribute("data-element-x")) ?? 0;
+          const elementInitialY =
+            Number(itemTarget.getAttribute("data-element-y")) ?? 0;
+
+          // Get how much mouse has moved
+          const mouseOffsetX =
+            e.clientX - Number(itemTarget.getAttribute("data-start-x"));
+          const mouseOffsetY =
+            e.clientY - Number(itemTarget.getAttribute("data-start-y"));
+
+          // Gets windows maximum bounds
+          const screen = document
+            .getElementById("editor-screen")
+            ?.getBoundingClientRect();
+          const itemBox = itemTarget.getBoundingClientRect();
+          const screenMaxX =
+            (screen?.x ?? 0) + (screen?.width ?? 0) + (itemBox.width ?? 0);
+          const screenMaxY =
+            (screen?.y ?? 0) + (screen?.height ?? 0) + (itemBox.height ?? 0);
+
+          // Move element to same distance the mouse has moved
+          // might need to do some checks here that the new position isn't outside the container's boundaries
+          itemTarget.style.left = `${Math.min(
+            screenMaxX,
+            Math.max(0, elementInitialX + mouseOffsetX)
+          )}px`;
+          itemTarget.style.top = `${Math.min(
+            screenMaxY,
+            Math.max(0, elementInitialY + mouseOffsetY)
+          )}px`;
+        }
+      }}
       onmouseleave={(e) => {
         for (const item of e.currentTarget.children) {
           item.classList.remove("dragging");
@@ -57,53 +102,6 @@ export const EditorScreen = () => {
                 "data-element-y",
                 itemTarget.style.top.replace("px", "") ?? 0
               );
-            }}
-            onmousemove={(e) => {
-              const itemTarget = e.currentTarget;
-
-              /* Calculates the distance the mouse has moved
-                and applies that amount to the element's initial position
-
-                Also respects the current bounds of the container
-              */
-              if (itemTarget.classList.contains("dragging")) {
-                // Element's initial position
-                const elementInitialX =
-                  Number(itemTarget.getAttribute("data-element-x")) ?? 0;
-                const elementInitialY =
-                  Number(itemTarget.getAttribute("data-element-y")) ?? 0;
-
-                // Get how much mouse has moved
-                const mouseOffsetX =
-                  e.clientX - Number(itemTarget.getAttribute("data-start-x"));
-                const mouseOffsetY =
-                  e.clientY - Number(itemTarget.getAttribute("data-start-y"));
-
-                // Gets windows maximum bounds
-                const screen = document
-                  .getElementById("editor-screen")
-                  ?.getBoundingClientRect();
-                const itemBox = itemTarget.getBoundingClientRect();
-                const screenMaxX =
-                  (screen?.x ?? 0) +
-                  (screen?.width ?? 0) +
-                  (itemBox.width ?? 0);
-                const screenMaxY =
-                  (screen?.y ?? 0) +
-                  (screen?.height ?? 0) +
-                  (itemBox.height ?? 0);
-
-                // Move element to same distance the mouse has moved
-                // might need to do some checks here that the new position isn't outside the container's boundaries
-                itemTarget.style.left = `${Math.min(
-                  screenMaxX,
-                  Math.max(0, elementInitialX + mouseOffsetX)
-                )}px`;
-                itemTarget.style.top = `${Math.min(
-                  screenMaxY,
-                  Math.max(0, elementInitialY + mouseOffsetY)
-                )}px`;
-              }
             }}
             onmouseup={(e) => {
               const itemTarget = e.currentTarget;
