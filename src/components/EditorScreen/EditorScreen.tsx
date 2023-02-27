@@ -63,7 +63,6 @@ export const EditorScreen = () => {
         {(item, index) => (
           <div
             style={{
-              background: `hsl(${Math.random() * 360}, 50%, 50%)`,
               "background-image": `url("${item}")`,
               "background-size": "cover",
             }}
