@@ -22,7 +22,7 @@ export const EditorScreen = () => {
     }
   `;
 
-  const items = [1, 2];
+  const items = ["images/creategame.png", "images/joingame.png"];
 
   const handleMouseUp = () => {
     // Find any elements with .draggable
@@ -62,7 +62,11 @@ export const EditorScreen = () => {
       <For each={items}>
         {(item, index) => (
           <div
-            style={{ background: `hsl(${Math.random() * 360}, 50%, 50%)` }}
+            style={{
+              background: `hsl(${Math.random() * 360}, 50%, 50%)`,
+              "background-image": `url("${item}")`,
+              "background-size": "cover",
+            }}
             class="item"
             onmousedown={(e) => {
               // Grab element being clicked
@@ -92,9 +96,7 @@ export const EditorScreen = () => {
                 handleMouseMove
               );
             }}
-          >
-            {item}
-          </div>
+          ></div>
         )}
       </For>
     </div>
