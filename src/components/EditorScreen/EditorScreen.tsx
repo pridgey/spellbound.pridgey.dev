@@ -72,6 +72,15 @@ export const EditorScreen = () => {
           )}px`;
         }
       }}
+      onmouseup={(e) => {
+        for (const item of e.currentTarget.children) {
+          item.classList.remove("dragging");
+          item.removeAttribute("data-start-x");
+          item.removeAttribute("data-start-y");
+          item.removeAttribute("data-element-x");
+          item.removeAttribute("data-element-y");
+        }
+      }}
       onmouseleave={(e) => {
         for (const item of e.currentTarget.children) {
           item.classList.remove("dragging");
