@@ -31,31 +31,52 @@ export const calculateResize = (
 
   switch (handle) {
     case "top-left":
-      const newWidth = elementInitialWidth - (mouseX - initialMouseX);
-      const newHeight = elementInitialWidth - (mouseY - initialMouseY);
-      const newX = elementInitialX + (mouseX - initialMouseX);
-      const newY = elementInitialY + (mouseY - initialMouseY);
-      resizedElement.style.width = `${newWidth}px`;
-      resizedElement.style.height = `${newHeight}px`;
-      resizedElement.style.left = `${newX}px`;
-      resizedElement.style.top = `${newY}px`;
+      // Calculate new dimensions and set element styles
+      resizedElement.style.width = `${
+        elementInitialWidth - (mouseX - initialMouseX)
+      }px`;
+      resizedElement.style.height = `${
+        elementInitialHeight - (mouseY - initialMouseY)
+      }px`;
+      resizedElement.style.left = `${
+        elementInitialX + (mouseX - initialMouseX)
+      }px`;
+      resizedElement.style.top = `${
+        elementInitialY + (mouseY - initialMouseY)
+      }px`;
+      break;
+    case "top-right":
+      // Calculate new dimensions and set element styles
+      resizedElement.style.width = `${
+        elementInitialWidth + (mouseX - initialMouseX)
+      }px`;
+      resizedElement.style.height = `${
+        elementInitialHeight - (mouseY - initialMouseY)
+      }px`;
+      resizedElement.style.top = `${
+        elementInitialY + (mouseY - initialMouseY)
+      }px`;
+      break;
+    case "bottom-left":
+      // Calculate new dimensions and set element styles
+      resizedElement.style.width = `${
+        elementInitialWidth - (mouseX - initialMouseX)
+      }px`;
+      resizedElement.style.height = `${
+        elementInitialHeight + (mouseY - initialMouseY)
+      }px`;
+      resizedElement.style.left = `${
+        elementInitialX + (mouseX - initialMouseX)
+      }px`;
+      break;
+    case "bottom-right":
+      // Calculate new dimensions and set element styles
+      resizedElement.style.width = `${
+        elementInitialWidth + (mouseX - initialMouseX)
+      }px`;
+      resizedElement.style.height = `${
+        elementInitialHeight + (mouseY - initialMouseY)
+      }px`;
       break;
   }
 };
-
-/**bottom-right:
-  new_width = element_original_width + (mouseX - original_mouseX)
-  new_height = element_original_height + (mouseY - original_mouseY)
-bottom-left:
-  new_width = element_original_width - (mouseX - original_mouseX)
-  new_height = element_original_height + (mouseY - original_mouseY)
-  new_x = element_original_x - (mouseX - original_mouseX)
-top-right:
-  new_width = element_original_width + (mouseX - original_mouseX)
-  new_height = element_original_height - (mouseY - original_mouseY)
-  new_y = element_original_y + (mouseY - original_mouseY)
-top-left:
-  new_width = element_original_width - (mouseX - original_mouseX)
-  new_height = element_original_height - (mouseY - original_mouseY)
-  new_x = element_original_x + (mouseX - original_mouseX)
-  new_y = element_original_y + (mouseY - original_mouseY) */

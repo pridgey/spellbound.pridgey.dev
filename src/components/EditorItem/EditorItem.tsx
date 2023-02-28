@@ -35,6 +35,16 @@ export const EditorItem = (props: EditorItemProps) => {
       top: -5px;
     }
 
+    .resize-top.resize-left,
+    .resize-bottom.resize-right {
+      cursor: nwse-resize;
+    }
+
+    .resize-top.resize-right,
+    .resize-bottom-resize-left {
+      cursor: nesw-resize;
+    }
+
     .resize-left {
       left: -5px;
     }
@@ -67,6 +77,12 @@ export const EditorItem = (props: EditorItemProps) => {
     for (const item of resizableItems) {
       item.classList.remove("resizing");
       item.removeAttribute("data-resize-handle");
+      item.removeAttribute("data-mouse-x");
+      item.removeAttribute("data-mouse-y");
+      item.removeAttribute("data-initial-width");
+      item.removeAttribute("data-initial-height");
+      item.removeAttribute("data-initial-x");
+      item.removeAttribute("data-initial-y");
     }
 
     // Remove move events
@@ -117,11 +133,11 @@ export const EditorItem = (props: EditorItemProps) => {
     );
     resizedElement?.setAttribute(
       "data-initial-x",
-      resizedElementBox?.x.toString() ?? ""
+      resizedElement.style.left.replace("px", "").toString() ?? ""
     );
     resizedElement?.setAttribute(
       "data-initial-y",
-      resizedElementBox?.y.toString() ?? ""
+      resizedElement.style.top.replace("px", "").toString() ?? ""
     );
 
     document.documentElement.addEventListener("mousemove", handleMouseMove);
