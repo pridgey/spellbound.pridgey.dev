@@ -25,36 +25,35 @@ export const EditorItem = (props: EditorItemProps) => {
       height: 200px;
       border: 1px solid white;
       user-select: none;
+      cursor: move;
     }
 
     .item:focus .resizable {
       display: block;
     }
 
-    .resize-top {
+    .top-left {
       top: -5px;
-    }
-
-    .resize-top.resize-left,
-    .resize-bottom.resize-right {
+      left: -5px;
       cursor: nwse-resize;
     }
 
-    .resize-top.resize-right,
-    .resize-bottom-resize-left {
+    .top-right {
+      top: -5px;
+      right: -5px;
       cursor: nesw-resize;
     }
 
-    .resize-left {
-      left: -5px;
-    }
-
-    .resize-bottom {
+    .bottom-left {
       bottom: -5px;
+      left: -5px;
+      cursor: nesw-resize;
     }
 
-    .resize-right {
+    .bottom-right {
+      bottom: -5px;
       right: -5px;
+      cursor: nwse-resize;
     }
   `;
 
@@ -180,28 +179,28 @@ export const EditorItem = (props: EditorItemProps) => {
       }}
     >
       <div
-        class="resizable resize-top resize-left"
+        class="resizable top-left"
         onMouseDown={(e) => {
           e.stopPropagation();
           handleResizeHandleDown(e, "top-left");
         }}
       ></div>
       <div
-        class="resizable resize-top resize-right"
+        class="resizable top-right"
         onMouseDown={(e) => {
           e.stopPropagation();
           handleResizeHandleDown(e, "top-right");
         }}
       ></div>
       <div
-        class="resizable resize-bottom resize-left"
+        class="resizable bottom-left"
         onMouseDown={(e) => {
           e.stopPropagation();
           handleResizeHandleDown(e, "bottom-left");
         }}
       ></div>
       <div
-        class="resizable resize-bottom resize-right"
+        class="resizable bottom-right"
         onMouseDown={(e) => {
           e.stopPropagation();
           handleResizeHandleDown(e, "bottom-right");
