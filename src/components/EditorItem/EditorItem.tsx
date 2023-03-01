@@ -1,6 +1,6 @@
 import { onCleanup, For } from "solid-js";
 import { css } from "solid-styled";
-import { useResizable, useTranslatable } from "~/utilities";
+import { useResizable, useRotatable, useTranslatable } from "~/utilities";
 import { ResizeHandles } from "~/types";
 
 export type EditorItemProps = {
@@ -28,11 +28,31 @@ export const EditorItem = (props: EditorItemProps) => {
       cursor: move;
     }
 
+    .rotation {
+      display: none;
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: white;
+      bottom: 20px;
+      right: 20px;
+      background-image: url("/images/rotate.svg");
+      background-size: 50%;
+      background-position: center;
+      border-radius: 100%;
+      background-repeat: no-repeat;
+      cursor: url("/images/rotate.svg"), auto;
+    }
+
     .item:focus {
       border: 1px solid white;
     }
 
     .item:focus .resizable {
+      display: block;
+    }
+
+    .item:focus .rotation {
       display: block;
     }
 
@@ -66,10 +86,13 @@ export const EditorItem = (props: EditorItemProps) => {
     useTranslatable();
   const { register: registerResizable, unregister: unregisterResizable } =
     useResizable();
+  const { register: registerRotatable, unregister: unregisterRotatable } =
+    useRotatable();
 
   onCleanup(() => {
     unregisterTranslatable();
     unregisterResizable();
+    unregisterRotatable();
   });
 
   return (
@@ -109,6 +132,13 @@ export const EditorItem = (props: EditorItemProps) => {
           ></div>
         )}
       </For>
+      <div
+        class="rotation"
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          registerRotatable(e.currentTarget as HTMLElement);
+        }}
+      ></div>
     </div>
   );
 };
