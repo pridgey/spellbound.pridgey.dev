@@ -32,3 +32,21 @@ export const useRotatable = () => {
     unregister,
   };
 };
+
+/**
+ *
+ *
+ *
+ *            a
+ * x ------------------- x
+ *                       |
+ *                       | o
+ *                       |
+ *                       x
+ *
+ *
+ *   Math.atan(opposite / adjacent)
+ *
+ *   o = y1 - y2
+ *   a = x1 - x2
+ */
