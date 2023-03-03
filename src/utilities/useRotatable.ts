@@ -31,6 +31,8 @@ export const useRotatable = () => {
 
       // Check if shift is held
       if (event.shiftKey) {
+        const angleInterval = 15;
+        angleDelta = Math.round(angleDelta / angleInterval) * angleInterval;
       }
 
       data.rotatableElement.style.rotate = `${angleDelta}deg`;
