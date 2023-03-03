@@ -136,7 +136,11 @@ export const EditorItem = (props: EditorItemProps) => {
         class="rotation"
         onMouseDown={(e) => {
           e.stopPropagation();
-          registerRotatable(e.currentTarget as HTMLElement);
+          registerRotatable(
+            (e.currentTarget as HTMLElement).parentElement!,
+            e.clientX,
+            e.clientY
+          );
         }}
       ></div>
     </div>
