@@ -53,6 +53,11 @@ export const EditorItem = (props: EditorItemProps) => {
       cursor: url("/images/rotate.svg"), auto;
     }
 
+    .frame:focus-visible,
+    .item:focus-visible {
+      outline: 0px;
+    }
+
     .frame:focus {
       border: 1px solid white;
       outline: 0px;
