@@ -37,8 +37,6 @@ export const useRotatable = () => {
 
       data.rotatableElement.style.rotate = `${angleDelta}deg`;
     }
-
-    // figure out angle between center of element, and mouse current position
   };
 
   const unregister = () => {
