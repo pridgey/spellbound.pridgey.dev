@@ -16,14 +16,23 @@ export const EditorItem = (props: EditorItemProps) => {
       height: 10px;
       border-radius: 100%;
       background-color: white;
+      user-select: none;
+    }
+
+    .frame {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      user-select: none;
+      cursor: move;
     }
 
     .item {
       position: absolute;
       left: 0px;
       top: 0px;
-      width: 200px;
-      height: 200px;
+      width: 100%;
+      height: 100%;
       user-select: none;
       cursor: move;
     }
@@ -44,15 +53,16 @@ export const EditorItem = (props: EditorItemProps) => {
       cursor: url("/images/rotate.svg"), auto;
     }
 
-    .item:focus {
+    .frame:focus {
       border: 1px solid white;
+      outline: 0px;
     }
 
-    .item:focus .resizable {
+    .frame:focus .resizable {
       display: block;
     }
 
-    .item:focus .rotation {
+    .frame:focus .rotation {
       display: block;
     }
 
@@ -95,14 +105,14 @@ export const EditorItem = (props: EditorItemProps) => {
     unregisterRotatable();
   });
 
+  let frameRef: HTMLElement;
+  let itemRef: HTMLElement;
+
   return (
     <div
       tabindex={0}
-      style={{
-        "background-image": `url("${props.Image}")`,
-        "background-size": "cover",
-      }}
-      class="item"
+      class="frame"
+      ref={frameRef! as HTMLDivElement}
       onmousedown={(e) => {
         // Grab element being clicked and its container
         const itemTarget = e.currentTarget;
@@ -111,14 +121,33 @@ export const EditorItem = (props: EditorItemProps) => {
         registerTranslatable(itemTarget, itemContainer, e.clientX, e.clientY);
       }}
     >
+      <div
+        style={{
+          "background-image": `url("${props.Image}")`,
+          "background-size": "cover",
+        }}
+        class="item"
+        ref={itemRef! as HTMLDivElement}
+      >
+        <div
+          class="rotation"
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            registerRotatable(
+              (e.currentTarget as HTMLElement).parentElement!,
+              e.clientX,
+              e.clientY
+            );
+          }}
+        ></div>
+      </div>
       <For each={["top-left", "top-right", "bottom-left", "bottom-right"]}>
         {(item) => (
           <div
             class={`resizable ${item}`}
             onMouseDown={(e) => {
               e.stopPropagation();
-              const resizedElement = (e.currentTarget as HTMLElement)
-                .parentElement!;
+              const resizedElement = frameRef;
               const container = document.getElementById("editor-screen")!;
 
               registerResizable(
@@ -132,17 +161,6 @@ export const EditorItem = (props: EditorItemProps) => {
           ></div>
         )}
       </For>
-      <div
-        class="rotation"
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          registerRotatable(
-            (e.currentTarget as HTMLElement).parentElement!,
-            e.clientX,
-            e.clientY
-          );
-        }}
-      ></div>
     </div>
   );
 };
