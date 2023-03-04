@@ -1,6 +1,17 @@
 import { css } from "solid-styled";
 import { EditorScreen } from "~/components";
 
+type GameItem = {
+  Height: number;
+  Fullscreen: boolean;
+  ImageURL: string;
+  Layer: number;
+  Left: number;
+  Rotation: number;
+  Top: number;
+  Width: number;
+};
+
 const Game = () => {
   css`
     main {
