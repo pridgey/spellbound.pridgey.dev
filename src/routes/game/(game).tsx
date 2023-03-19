@@ -1,16 +1,8 @@
 import { css } from "solid-styled";
 import { EditorScreen } from "~/components";
-
-type GameItem = {
-  Height: number;
-  Fullscreen: boolean;
-  ImageURL: string;
-  Layer: number;
-  Left: number;
-  Rotation: number;
-  Top: number;
-  Width: number;
-};
+import { GameItem } from "~/types";
+import { mapLayersAtom } from "~/state/mapState";
+import { useAtom } from "solid-jotai";
 
 const Game = () => {
   css`
@@ -95,6 +87,8 @@ const Game = () => {
     }
   `;
 
+  const [mapLayers, setMapLayers] = useAtom<GameItem[]>(mapLayersAtom);
+
   return (
     <main>
       <input class="title" placeholder="Game Title" />
@@ -113,7 +107,7 @@ const Game = () => {
         <div class="temp">Combat</div>
       </div>
       <div class="map-container">
-        <EditorScreen />
+        <EditorScreen MapLayers={mapLayers()} />
       </div>
       <aside class="sidebar"></aside>
     </main>

@@ -1,10 +1,10 @@
 import { onCleanup, For } from "solid-js";
 import { css } from "solid-styled";
 import { useResizable, useRotatable, useTranslatable } from "~/utilities";
-import { ResizeHandles } from "~/types";
+import { GameItem, ResizeHandles } from "~/types";
 
 export type EditorItemProps = {
-  Image: string;
+  Item: GameItem;
 };
 
 export const EditorItem = (props: EditorItemProps) => {
@@ -21,16 +21,16 @@ export const EditorItem = (props: EditorItemProps) => {
 
     .frame {
       position: absolute;
-      width: 200px;
-      height: 200px;
+      width: ${`${props.Item.Width.toString()}px`};
+      height: ${`${props.Item.Height.toString()}px`};
       user-select: none;
       cursor: move;
     }
 
     .item {
       position: absolute;
-      left: 0px;
-      top: 0px;
+      left: ${`${props.Item.Left.toString()}px`};
+      top: ${`${props.Item.Top.toString()}px`};
       width: 100%;
       height: 100%;
       user-select: none;
@@ -168,7 +168,7 @@ export const EditorItem = (props: EditorItemProps) => {
     >
       <div
         style={{
-          "background-image": `url("${props.Image}")`,
+          "background-image": `url("${props.Item.ImageURL}")`,
           "background-size": "cover",
         }}
         class="item"

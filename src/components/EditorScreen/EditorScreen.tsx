@@ -1,8 +1,13 @@
 import { For } from "solid-js";
 import { css } from "solid-styled";
 import { EditorItem } from "../EditorItem";
+import { GameItem } from "~/types";
 
-export const EditorScreen = () => {
+type EditorScreenProps = {
+  MapLayers: GameItem[];
+};
+
+export const EditorScreen = (props: EditorScreenProps) => {
   css`
     .screen {
       position: relative;
@@ -36,7 +41,7 @@ export const EditorScreen = () => {
 
   return (
     <div class="screen" id="editor-screen">
-      <For each={items}>{(item) => <EditorItem Image={item} />}</For>
+      <For each={props.MapLayers}>{(item) => <EditorItem Item={item} />}</For>
     </div>
   );
 };

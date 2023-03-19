@@ -2686,6 +2686,11 @@ sirv@^2.0.2:
     mrmime "^1.0.0"
     totalist "^3.0.0"
 
+solid-jotai@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/solid-jotai/-/solid-jotai-0.2.0.tgz#10ef9df0219228c86d1aa8c7e2a134aa702cc7d6"
+  integrity sha512-6LK0USfcgLAUpTqiS+fjXgJb6hE7M0Zg4YohXmLLNXvEStG1UZwCjALahvYzNYOS3nXY3HMKlQTXwH+IEekffw==
+
 solid-js@^1.6.11:
   version "1.6.11"
   resolved "https://registry.yarnpkg.com/solid-js/-/solid-js-1.6.11.tgz#263a512bf94efd89245a77f58dc18c195302237f"
