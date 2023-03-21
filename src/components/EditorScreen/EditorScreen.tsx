@@ -1,7 +1,8 @@
-import { For } from "solid-js";
+import { For, createEffect } from "solid-js";
 import { css } from "solid-styled";
 import { EditorItem } from "../EditorItem";
 import { GameItem } from "~/types";
+import mapState from "~/state/mapState";
 
 type EditorScreenProps = {
   MapLayers: GameItem[];
@@ -36,6 +37,14 @@ export const EditorScreen = (props: EditorScreenProps) => {
       border: 2px solid tomato;
     }
   `;
+
+  const { currentLayers } = mapState;
+
+  console.log("State test:", { currentLayers: currentLayers() });
+
+  createEffect(() => {
+    console.log({ currentLayers: currentLayers() });
+  });
 
   const items = ["images/creategame.png", "images/joingame.png"];
 

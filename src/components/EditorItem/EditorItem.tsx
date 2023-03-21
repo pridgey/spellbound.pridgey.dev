@@ -2,6 +2,7 @@ import { onCleanup, For } from "solid-js";
 import { css } from "solid-styled";
 import { useResizable, useRotatable, useTranslatable } from "~/utilities";
 import { GameItem, ResizeHandles } from "~/types";
+import mapState from "~/state/mapState";
 
 export type EditorItemProps = {
   Item: GameItem;
@@ -21,8 +22,12 @@ export const EditorItem = (props: EditorItemProps) => {
 
     .frame {
       position: absolute;
-      width: ${`${props.Item.Width.toString()}px`};
-      height: ${`${props.Item.Height.toString()}px`};
+      width: ${`${props.Item.Width.toString()}${
+        props.Item.Width.toString().includes("%") ? "" : "px"
+      }`};
+      height: ${`${props.Item.Height.toString()}${
+        props.Item.Height.toString().includes("%") ? "" : "px"
+      }`};
       user-select: none;
       cursor: move;
     }
@@ -136,7 +141,7 @@ export const EditorItem = (props: EditorItemProps) => {
     }
   `;
 
-  // Hooks
+  // Transformation hooks
   const { register: registerTranslatable, unregister: unregisterTranslatable } =
     useTranslatable();
   const { register: registerResizable, unregister: unregisterResizable } =
@@ -152,6 +157,8 @@ export const EditorItem = (props: EditorItemProps) => {
 
   let frameRef: HTMLElement;
   let itemRef: HTMLElement;
+
+  const { currentLayers, setLayer } = mapState;
 
   return (
     <div
@@ -199,10 +206,17 @@ export const EditorItem = (props: EditorItemProps) => {
       <div class="toolbar">
         <button
           onClick={() => {
-            frameRef.style.setProperty("height", "100%");
-            frameRef.style.setProperty("width", "100%");
-            frameRef.style.setProperty("left", "0px");
-            frameRef.style.setProperty("top", "0px");
+            setLayer(0, {
+              ...currentLayers()[0],
+              Height: "100%",
+              Left: 0,
+              Top: 0,
+              Width: "100%",
+            } as unknown as GameItem);
+            // frameRef.style.setProperty("height", "100%");
+            // frameRef.style.setProperty("width", "100%");
+            // frameRef.style.setProperty("left", "0px");
+            // frameRef.style.setProperty("top", "0px");
           }}
         >
           <svg

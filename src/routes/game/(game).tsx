@@ -1,8 +1,7 @@
 import { css } from "solid-styled";
 import { EditorScreen } from "~/components";
 import { GameItem } from "~/types";
-import { mapLayersAtom } from "~/state/mapState";
-import { useAtom } from "solid-jotai";
+import mapState from "~/state/mapState";
 
 const Game = () => {
   css`
@@ -87,7 +86,7 @@ const Game = () => {
     }
   `;
 
-  const [mapLayers, setMapLayers] = useAtom<GameItem[]>(mapLayersAtom);
+  const { currentLayers } = mapState;
 
   return (
     <main>
@@ -107,7 +106,7 @@ const Game = () => {
         <div class="temp">Combat</div>
       </div>
       <div class="map-container">
-        <EditorScreen MapLayers={mapLayers()} />
+        <EditorScreen MapLayers={currentLayers()} />
       </div>
       <aside class="sidebar"></aside>
     </main>
