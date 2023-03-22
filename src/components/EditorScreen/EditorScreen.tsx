@@ -38,14 +38,6 @@ export const EditorScreen = (props: EditorScreenProps) => {
     }
   `;
 
-  const { currentLayers } = mapState;
-
-  console.log("State test:", { currentLayers: currentLayers() });
-
-  createEffect(() => {
-    console.log({ currentLayers: currentLayers() });
-  });
-
   const items = ["images/creategame.png", "images/joingame.png"];
 
   return (

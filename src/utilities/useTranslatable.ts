@@ -9,10 +9,14 @@ type TranslatableProps = {
   elementStartY: number;
 };
 
-export const useTranslatable = () => {
+export const useTranslatable = (onFinish: (x: number, y: number) => void) => {
   const [translatableElement, setTranslatableElement] =
     createSignal<TranslatableProps>();
 
+  let currentX = 0;
+  let currentY = 0;
+
+  // Function to call during mouseMove, drags the element around the screen
   const translate = (event: MouseEvent) => {
     const data = translatableElement();
     if (data?.translateableElement) {
@@ -56,14 +60,19 @@ export const useTranslatable = () => {
       // Update the dragged element's left and top positions
       data.translateableElement.style.left = `${newX}px`;
       data.translateableElement.style.top = `${newY}px`;
+      currentX = newX;
+      currentY = newY;
     }
   };
 
+  // Function to call when mouseUp, removes events from the document
   const unregister = () => {
+    onFinish(currentX, currentY);
     setTranslatableElement();
     document?.documentElement?.removeEventListener("mousemove", translate);
   };
 
+  // Function to call on mouseDown, adds events to the document
   const register = (
     element: HTMLElement,
     container: HTMLElement,

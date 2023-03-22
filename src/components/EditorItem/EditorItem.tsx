@@ -1,4 +1,4 @@
-import { onCleanup, For } from "solid-js";
+import { onCleanup, For, onMount } from "solid-js";
 import { css } from "solid-styled";
 import { useResizable, useRotatable, useTranslatable } from "~/utilities";
 import { GameItem, ResizeHandles } from "~/types";
@@ -22,20 +22,16 @@ export const EditorItem = (props: EditorItemProps) => {
 
     .frame {
       position: absolute;
-      width: ${`${props.Item.Width.toString()}${
-        props.Item.Width.toString().includes("%") ? "" : "px"
-      }`};
-      height: ${`${props.Item.Height.toString()}${
-        props.Item.Height.toString().includes("%") ? "" : "px"
-      }`};
+      width: ${props.Item.Fullscreen ? "100%" : `${props.Item.Width}px`};
+      height: ${props.Item.Fullscreen ? "100%" : `${props.Item.Height}px`};
       user-select: none;
       cursor: move;
     }
 
     .item {
       position: absolute;
-      left: ${`${props.Item.Left.toString()}px`};
-      top: ${`${props.Item.Top.toString()}px`};
+      left: ${props.Item.Fullscreen ? "0" : props.Item.Left.toString()}px;
+      top: ${props.Item.Fullscreen ? "0" : props.Item.Top.toString()}px;
       width: 100%;
       height: 100%;
       user-select: none;
@@ -141,13 +137,26 @@ export const EditorItem = (props: EditorItemProps) => {
     }
   `;
 
+  const { currentLayers, setLayerByID } = mapState;
+
   // Transformation hooks
-  const { register: registerTranslatable, unregister: unregisterTranslatable } =
-    useTranslatable();
-  const { register: registerResizable, unregister: unregisterResizable } =
-    useResizable();
-  const { register: registerRotatable, unregister: unregisterRotatable } =
-    useRotatable();
+  onMount(() => {
+    const {
+      register: registerTranslatable,
+      unregister: unregisterTranslatable,
+    } = useTranslatable((newX, newY) => {
+      console.log("UseTranslatable:", { newX, newY });
+      setLayerByID(props.Item.ID, {
+        ...props.Item,
+        Top: newY,
+        Left: newX,
+      });
+    });
+    const { register: registerResizable, unregister: unregisterResizable } =
+      useResizable();
+    const { register: registerRotatable, unregister: unregisterRotatable } =
+      useRotatable();
+  });
 
   onCleanup(() => {
     unregisterTranslatable();
@@ -157,8 +166,6 @@ export const EditorItem = (props: EditorItemProps) => {
 
   let frameRef: HTMLElement;
   let itemRef: HTMLElement;
-
-  const { currentLayers, setLayer } = mapState;
 
   return (
     <div
@@ -206,17 +213,15 @@ export const EditorItem = (props: EditorItemProps) => {
       <div class="toolbar">
         <button
           onClick={() => {
-            setLayer(0, {
-              ...currentLayers()[0],
-              Height: "100%",
-              Left: 0,
-              Top: 0,
-              Width: "100%",
+            // Set layer to full-screen
+            setLayerByID(props.Item.ID, {
+              ...props.Item,
+              Fullscreen: true,
+              // Height: "100%",
+              // Left: 0,
+              // Top: 0,
+              // Width: "100%",
             } as unknown as GameItem);
-            // frameRef.style.setProperty("height", "100%");
-            // frameRef.style.setProperty("width", "100%");
-            // frameRef.style.setProperty("left", "0px");
-            // frameRef.style.setProperty("top", "0px");
           }}
         >
           <svg

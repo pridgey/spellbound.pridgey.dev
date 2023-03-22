@@ -7,6 +7,7 @@ const createMapState = () => {
     {
       Fullscreen: false,
       Height: 200,
+      ID: "0",
       ImageURL: "images/creategame.png",
       Layer: 0,
       Left: 0,
@@ -28,9 +29,22 @@ const createMapState = () => {
       return [...prev];
     });
   };
+  const setLayerByID = (id: string, layerValue: GameItem) => {
+    setCurrentLayers((prev) => {
+      const layerIndex = prev.findIndex((layer) => layer.ID === id);
+
+      if (layerIndex > -1) {
+        prev[layerIndex] = {
+          ...layerValue,
+        };
+      }
+
+      return [...prev];
+    });
+  };
 
   // Return all the stuff from the store
-  return { currentLayers, getLayer, setLayer };
+  return { currentLayers, getLayer, setLayer, setLayerByID };
 };
 
 export default createRoot(createMapState);
