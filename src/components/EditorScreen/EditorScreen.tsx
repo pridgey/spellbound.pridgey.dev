@@ -38,11 +38,17 @@ export const EditorScreen = (props: EditorScreenProps) => {
     }
   `;
 
-  const items = ["images/creategame.png", "images/joingame.png"];
+  let ContainerRef: HTMLDivElement;
 
   return (
-    <div class="screen" id="editor-screen">
-      <For each={props.MapLayers}>{(item) => <EditorItem Item={item} />}</For>
+    <div
+      class="screen"
+      id="editor-screen"
+      ref={ContainerRef! as HTMLDivElement}
+    >
+      <For each={props.MapLayers}>
+        {(item) => <EditorItem Container={ContainerRef} Item={item} />}
+      </For>
     </div>
   );
 };

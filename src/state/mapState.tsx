@@ -15,27 +15,56 @@ const createMapState = () => {
       Top: 0,
       Width: 200,
     },
+    {
+      Fullscreen: false,
+      Height: 200,
+      ID: "1",
+      ImageURL: "images/joingame.png",
+      Layer: 0,
+      Left: 0,
+      Rotation: 0,
+      Top: 0,
+      Width: 200,
+    },
   ]);
 
   // Actions in the store
+  /**
+   * Retrieve a specific layer of state by index
+   * @param index The index to return
+   * @returns The item at the specified index
+   */
   const getLayer = (index: number) => currentLayers()[index];
-  const setLayer = (index: number, layerValue: GameItem) => {
-    setCurrentLayers((prev) => {
-      console.log({ prev, index, layer: prev[index], layerValue });
-      prev[index] = {
-        ...layerValue,
+
+  /**
+   * Updates the map layer item in state by index
+   * @param index The index of the map layer item to update
+   * @param newValue The new value data for the map layer item
+   */
+  const setLayer = (index: number, newValue: GameItem) => {
+    // Update state, use index to find item in array
+    setCurrentLayers((prevState) => {
+      // Update this index with new value
+      prevState[index] = {
+        ...newValue,
       };
 
-      return [...prev];
+      return [...prevState];
     });
   };
-  const setLayerByID = (id: string, layerValue: GameItem) => {
+
+  /**
+   * Updates the map layer item in state by ID
+   * @param id The id of the map layer item to update
+   * @param newValue The new value data for the map layer item
+   */
+  const setLayerByID = (id: string, newValue: GameItem) => {
     setCurrentLayers((prev) => {
       const layerIndex = prev.findIndex((layer) => layer.ID === id);
 
       if (layerIndex > -1) {
         prev[layerIndex] = {
-          ...layerValue,
+          ...newValue,
         };
       }
 

@@ -1,10 +1,11 @@
-import { onCleanup, For, onMount } from "solid-js";
+import { onCleanup, For, onMount, createEffect } from "solid-js";
 import { css } from "solid-styled";
-import { useResizable, useRotatable, useTranslatable } from "~/utilities";
+import { useDraggable, useResizable, useRotatable } from "~/utilities";
 import { GameItem, ResizeHandles } from "~/types";
 import mapState from "~/state/mapState";
 
 export type EditorItemProps = {
+  Container: HTMLElement;
   Item: GameItem;
 };
 
@@ -24,14 +25,16 @@ export const EditorItem = (props: EditorItemProps) => {
       position: absolute;
       width: ${props.Item.Fullscreen ? "100%" : `${props.Item.Width}px`};
       height: ${props.Item.Fullscreen ? "100%" : `${props.Item.Height}px`};
+      left: ${props.Item.Fullscreen
+        ? "0px"
+        : `${props.Item.Left.toString()}px`};
+      top: ${props.Item.Fullscreen ? "0px" : `${props.Item.Top.toString()}px`};
       user-select: none;
       cursor: move;
     }
 
     .item {
       position: absolute;
-      left: ${props.Item.Fullscreen ? "0" : props.Item.Left.toString()}px;
-      top: ${props.Item.Fullscreen ? "0" : props.Item.Top.toString()}px;
       width: 100%;
       height: 100%;
       user-select: none;
@@ -137,49 +140,53 @@ export const EditorItem = (props: EditorItemProps) => {
     }
   `;
 
-  const { currentLayers, setLayerByID } = mapState;
+  // Current map layer stateful actions
+  const { setLayerByID } = mapState;
 
-  // Transformation hooks
-  onMount(() => {
-    const {
-      register: registerTranslatable,
-      unregister: unregisterTranslatable,
-    } = useTranslatable((newX, newY) => {
-      console.log("UseTranslatable:", { newX, newY });
-      setLayerByID(props.Item.ID, {
-        ...props.Item,
-        Top: newY,
-        Left: newX,
-      });
-    });
-    const { register: registerResizable, unregister: unregisterResizable } =
-      useResizable();
-    const { register: registerRotatable, unregister: unregisterRotatable } =
-      useRotatable();
-  });
-
-  onCleanup(() => {
-    unregisterTranslatable();
-    unregisterResizable();
-    unregisterRotatable();
-  });
-
+  // References to the element and its frame
   let frameRef: HTMLElement;
   let itemRef: HTMLElement;
 
-  return (
-    <div
-      tabindex={0}
-      class="frame"
-      ref={frameRef! as HTMLDivElement}
-      onmousedown={(e) => {
-        // Grab element being clicked and its container
-        const itemTarget = e.currentTarget;
-        const itemContainer = document.getElementById("editor-screen")!;
+  // Draggable Event
+  const { subscribe: subscribeDraggable, unsubscribe: unsubscribeDraggable } =
+    useDraggable(frameRef!, props.Container, {
+      OnDragEnd: (x, y) => {
+        setLayerByID(props.Item.ID, {
+          ...props.Item,
+          Left: x,
+          Top: y,
+        });
+      },
+    });
 
-        registerTranslatable(itemTarget, itemContainer, e.clientX, e.clientY);
-      }}
-    >
+  // Item remounts when state updates
+  onMount(() => {
+    // Subscribe to the draggable hook
+    subscribeDraggable(frameRef, props.Container);
+
+    // const { register: registerResizable, unregister: unregisterResizable } =
+    //   useResizable();
+    // const { register: registerRotatable, unregister: unregisterRotatable } =
+    //   useRotatable();
+  });
+
+  // Item runs cleanup as state updates
+  onCleanup(() => {
+    // Remove all draggable events
+    unsubscribeDraggable();
+
+    // unregisterResizable();
+    // unregisterRotatable();
+  });
+
+  const ItemFrame = (props: any) => (
+    <div tabindex={0} class="frame" ref={frameRef! as HTMLDivElement}>
+      {props.children}
+    </div>
+  );
+
+  return (
+    <ItemFrame>
       <div
         style={{
           "background-image": `url("${props.Item.ImageURL}")`,
@@ -198,13 +205,13 @@ export const EditorItem = (props: EditorItemProps) => {
               const resizedElement = frameRef;
               const container = document.getElementById("editor-screen")!;
 
-              registerResizable(
-                item as ResizeHandles,
-                resizedElement,
-                container,
-                e.clientX,
-                e.clientY
-              );
+              // registerResizable(
+              //   item as ResizeHandles,
+              //   resizedElement,
+              //   container,
+              //   e.clientX,
+              //   e.clientY
+              // );
             }}
           ></div>
         )}
@@ -292,9 +299,9 @@ export const EditorItem = (props: EditorItemProps) => {
         class="rotation"
         onMouseDown={(e) => {
           e.stopPropagation();
-          registerRotatable(itemRef, e.clientX, e.clientY);
+          // registerRotatable(itemRef, e.clientX, e.clientY);
         }}
       ></div>
-    </div>
+    </ItemFrame>
   );
 };
