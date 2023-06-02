@@ -1,13 +1,30 @@
 import { createSignal } from "solid-js";
 
 type RotatableProps = {
-  rotatableElement: HTMLElement;
+  rotatableElement: HTMLElement | undefined;
   startingAngle: number;
   currentRotation: number;
   x1: number;
   y1: number;
 };
 
+// The default state object
+const defaultState: RotatableProps = {
+  rotatableElement: undefined,
+  startingAngle: 0,
+  currentRotation: 0,
+  x1: 0,
+  y1: 0,
+};
+
+/**
+ * Helper function to calculate the rotation based on initial mouse position and new mouse position
+ * @param x1 x value of first coordinate
+ * @param y1 y value of first coordinate
+ * @param x2 x value of second coordinate
+ * @param y2 y value of second coordinate
+ * @returns the calculated angle
+ */
 const getAngle = (x1: number, y1: number, x2: number, y2: number) => {
   const opposite = y1 - y2;
   const adjacent = x1 - x2;
@@ -15,10 +32,16 @@ const getAngle = (x1: number, y1: number, x2: number, y2: number) => {
   return angle * (180 / Math.PI);
 };
 
-export const useRotatable = () => {
-  const [rotatableInfo, setRotatableInfo] = createSignal<RotatableProps>();
+/**
+ * Hook to attach a rotatable functionality
+ * @param OnRotateEnd Callback function to return the final rotation value
+ * @returns subscribe and unsubscribe events to hook into the rotation
+ */
+export const useRotatable = (OnRotateEnd: (angle: number) => void) => {
+  const [rotatableInfo, setRotatableInfo] =
+    createSignal<RotatableProps>(defaultState);
 
-  const rotate = (event: MouseEvent) => {
+  const handleMouseMove = (event: MouseEvent) => {
     const data = rotatableInfo();
 
     if (data?.rotatableElement) {
@@ -39,19 +62,21 @@ export const useRotatable = () => {
     }
   };
 
-  const unregister = () => {
-    setRotatableInfo();
-    document?.documentElement?.removeEventListener("mousemove", rotate);
+  const handleMouseUp = () => {
+    setRotatableInfo(defaultState);
+    OnRotateEnd?.(rotatableInfo()?.currentRotation ?? 0);
   };
 
-  const register = (element: HTMLElement, mouseX: number, mouseY: number) => {
+  const handleMouseDown = (e: MouseEvent) => {
+    const element = rotatableInfo()?.rotatableElement;
     if (element) {
+      // calculate starting angle
       const rotatableElementBox = element.getBoundingClientRect();
       const x1 = rotatableElementBox.x + rotatableElementBox.width / 2;
       const y1 = rotatableElementBox.y + rotatableElementBox.height / 2;
 
-      const x2 = mouseX;
-      const y2 = mouseY;
+      const x2 = e.clientX;
+      const y2 = e.clientY;
 
       const startingAngle = getAngle(x1, y1, x2, y2);
 
@@ -59,16 +84,42 @@ export const useRotatable = () => {
         element.style.getPropertyValue("rotate").replace("deg", "") ?? 0
       );
 
-      setRotatableInfo({
-        rotatableElement: element,
+      // Set state with starting information
+      setRotatableInfo((currentState) => ({
+        ...currentState,
         startingAngle,
         currentRotation,
         x1,
         y1,
-      });
+      }));
+    }
+  };
 
-      document?.documentElement?.addEventListener("mousemove", rotate);
-      document?.documentElement?.addEventListener("mouseup", unregister);
+  const unregister = () => {
+    setRotatableInfo(defaultState);
+    // Remove events
+    rotatableInfo()?.rotatableElement?.removeEventListener(
+      "mousedown",
+      handleMouseDown
+    );
+    document?.documentElement?.removeEventListener(
+      "mousemove",
+      handleMouseMove
+    );
+    document?.documentElement?.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  const register = (element: HTMLElement) => {
+    if (element) {
+      setRotatableInfo((currentState) => {
+        return {
+          ...currentState,
+          rotatableElement: element,
+        };
+      });
+      element.addEventListener("mousedown", handleMouseDown);
+      document?.documentElement?.addEventListener("mousemove", handleMouseMove);
+      document?.documentElement?.addEventListener("mouseup", handleMouseUp);
     }
   };
 

@@ -39,6 +39,7 @@ export const EditorItem = (props: EditorItemProps) => {
       height: 100%;
       user-select: none;
       cursor: move;
+      rotate: ${props.Item.Rotation.toString() ?? 0}deg;
     }
 
     .rotation {
@@ -147,22 +148,41 @@ export const EditorItem = (props: EditorItemProps) => {
   let frameRef: HTMLElement;
   let itemRef: HTMLElement;
 
-  // Draggable Event
+  console.log("Render EditorItem:", { props });
+
+  // Draggable Hook
   const { subscribe: subscribeDraggable, unsubscribe: unsubscribeDraggable } =
     useDraggable(frameRef!, props.Container, {
       OnDragEnd: (x, y) => {
-        setLayerByID(props.Item.ID, {
-          ...props.Item,
-          Left: x,
-          Top: y,
-        });
+        if (x !== props.Item.Left || y !== props.Item.Top) {
+          setLayerByID(props.Item.ID, {
+            ...props.Item,
+            Left: x,
+            Top: y,
+            Selected: true,
+          });
+        }
       },
+    });
+
+  // Rotatable Hook
+  const { register: subscribeRotate, unregister: unsubscribeRotate } =
+    useRotatable((newAngle) => {
+      // setLayerByID(props.Item.ID, {
+      //   ...props.Item,
+      //   Rotation: newAngle,
+      // });
     });
 
   // Item remounts when state updates
   onMount(() => {
     // Subscribe to the draggable hook
     subscribeDraggable(frameRef, props.Container);
+
+    if (props.Item.Selected) {
+      console.log("Attempting to focus", { itemRef });
+      itemRef?.focus();
+    }
 
     // const { register: registerResizable, unregister: unregisterResizable } =
     //   useResizable();
@@ -174,9 +194,10 @@ export const EditorItem = (props: EditorItemProps) => {
   onCleanup(() => {
     // Remove all draggable events
     unsubscribeDraggable();
+    // Remove rotate events
+    unsubscribeRotate();
 
     // unregisterResizable();
-    // unregisterRotatable();
   });
 
   const ItemFrame = (props: any) => (
@@ -186,8 +207,9 @@ export const EditorItem = (props: EditorItemProps) => {
   );
 
   return (
-    <ItemFrame>
+    <ItemFrame Item={props.Item}>
       <div
+        tabIndex={0}
         style={{
           "background-image": `url("${props.Item.ImageURL}")`,
           "background-size": "cover",
@@ -224,10 +246,6 @@ export const EditorItem = (props: EditorItemProps) => {
             setLayerByID(props.Item.ID, {
               ...props.Item,
               Fullscreen: true,
-              // Height: "100%",
-              // Left: 0,
-              // Top: 0,
-              // Width: "100%",
             } as unknown as GameItem);
           }}
         >
@@ -248,7 +266,15 @@ export const EditorItem = (props: EditorItemProps) => {
             ></path>
           </svg>
         </button>
-        <button>
+        <button
+          id="layer-down"
+          onClick={() => {
+            setLayerByID(props.Item.ID, {
+              ...props.Item,
+              Layer: props.Item.Layer - 1,
+            });
+          }}
+        >
           <svg
             stroke="currentColor"
             fill="currentColor"
@@ -267,12 +293,12 @@ export const EditorItem = (props: EditorItemProps) => {
           </svg>
         </button>
         <button
+          id="layer-up"
           onClick={() => {
-            const zindex = Number(
-              frameRef.style.getPropertyValue("z-index") || "0"
-            );
-
-            frameRef.style.setProperty("z-index", `${zindex + 1}`);
+            setLayerByID(props.Item.ID, {
+              ...props.Item,
+              Layer: props.Item.Layer + 1,
+            });
           }}
         >
           <svg
@@ -299,7 +325,7 @@ export const EditorItem = (props: EditorItemProps) => {
         class="rotation"
         onMouseDown={(e) => {
           e.stopPropagation();
-          // registerRotatable(itemRef, e.clientX, e.clientY);
+          subscribeRotate(itemRef);
         }}
       ></div>
     </ItemFrame>
