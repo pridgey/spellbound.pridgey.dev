@@ -21,7 +21,7 @@ const createMapState = () => {
       Height: 200,
       ID: "1",
       ImageURL: "images/joingame.png",
-      Layer: 0,
+      Layer: 1,
       Left: 0,
       Rotation: 0,
       Selected: false,
@@ -30,7 +30,54 @@ const createMapState = () => {
     },
   ]);
 
-  // Actions in the store
+  // ----- Actions in the store -----
+
+  /**
+   * Move a layer up in the array
+   * @param layerId The ID of the layer to move up
+   */
+  const moveLayerUp = (layerId: string) => {
+    setCurrentLayers((current) => {
+      const layerIndex = current.findIndex((layer) => layer.ID === layerId);
+
+      // Only do so if it isn't the last item in the array
+      if (layerIndex < current.length - 1) {
+        const hold = current[layerIndex + 1];
+        current[layerIndex + 1] = current[layerIndex];
+        current[layerIndex] = hold;
+        current.forEach((layer) => {
+          layer.Selected = false;
+        });
+        current[layerIndex + 1].Selected = true;
+      }
+
+      return [...current];
+    });
+  };
+
+  /**
+   * Move a layer down in the array
+   * @param layerId The ID of the layer to move down
+   */
+  const moveLayerDown = (layerId: string) => {
+    setCurrentLayers((current) => {
+      const layerIndex = current.findIndex((layer) => layer.ID === layerId);
+
+      // Only do so if it isn't the last item in the array
+      if (layerIndex > 0) {
+        const hold = current[layerIndex - 1];
+        current[layerIndex - 1] = current[layerIndex];
+        current[layerIndex] = hold;
+        current.forEach((layer) => {
+          layer.Selected = false;
+        });
+        current[layerIndex - 1].Selected = true;
+      }
+
+      return [...current];
+    });
+  };
+
   /**
    * Retrieve a specific layer of state by index
    * @param index The index to return
@@ -75,7 +122,14 @@ const createMapState = () => {
   };
 
   // Return all the stuff from the store
-  return { currentLayers, getLayer, setLayer, setLayerByID };
+  return {
+    currentLayers,
+    getLayer,
+    setLayer,
+    setLayerByID,
+    moveLayerUp,
+    moveLayerDown,
+  };
 };
 
 export default createRoot(createMapState);

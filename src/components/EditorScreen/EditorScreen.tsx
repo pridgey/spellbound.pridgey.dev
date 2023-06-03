@@ -40,13 +40,15 @@ export const EditorScreen = (props: EditorScreenProps) => {
 
   let ContainerRef: HTMLDivElement;
 
+  const { currentLayers } = mapState;
+
   return (
     <div
       class="screen"
       id="editor-screen"
       ref={ContainerRef! as HTMLDivElement}
     >
-      <For each={props.MapLayers}>
+      <For each={currentLayers()}>
         {(item) => <EditorItem Container={ContainerRef} Item={item} />}
       </For>
     </div>

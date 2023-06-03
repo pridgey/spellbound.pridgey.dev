@@ -40,6 +40,7 @@ export const EditorItem = (props: EditorItemProps) => {
       user-select: none;
       cursor: move;
       rotate: ${props.Item.Rotation.toString() ?? 0}deg;
+      border: 0px;
     }
 
     .rotation {
@@ -56,6 +57,7 @@ export const EditorItem = (props: EditorItemProps) => {
       border-radius: 100%;
       background-repeat: no-repeat;
       cursor: url("/images/rotate.svg"), auto;
+      z-index: 2;
     }
 
     /* Toolbar styling */
@@ -69,6 +71,7 @@ export const EditorItem = (props: EditorItemProps) => {
       flex-direction: row;
       border-radius: 2rem;
       overflow: hidden;
+      z-index: 2;
     }
 
     /* Toolbar button styling */
@@ -142,7 +145,7 @@ export const EditorItem = (props: EditorItemProps) => {
   `;
 
   // Current map layer stateful actions
-  const { setLayerByID } = mapState;
+  const { setLayerByID, moveLayerUp, moveLayerDown } = mapState;
 
   // References to the element and its frame
   let frameRef: HTMLElement;
@@ -208,15 +211,16 @@ export const EditorItem = (props: EditorItemProps) => {
 
   return (
     <ItemFrame Item={props.Item}>
-      <div
+      <button
+        autofocus={props.Item.Selected}
         tabIndex={0}
         style={{
           "background-image": `url("${props.Item.ImageURL}")`,
           "background-size": "cover",
         }}
         class="item"
-        ref={itemRef! as HTMLDivElement}
-      ></div>
+        ref={itemRef! as HTMLButtonElement}
+      ></button>
       {/* Render each of the four scaling handles */}
       <For each={["top-left", "top-right", "bottom-left", "bottom-right"]}>
         {(item) => (
@@ -266,15 +270,7 @@ export const EditorItem = (props: EditorItemProps) => {
             ></path>
           </svg>
         </button>
-        <button
-          id="layer-down"
-          onClick={() => {
-            setLayerByID(props.Item.ID, {
-              ...props.Item,
-              Layer: props.Item.Layer - 1,
-            });
-          }}
-        >
+        <button id="layer-down" onClick={() => moveLayerDown(props.Item.ID)}>
           <svg
             stroke="currentColor"
             fill="currentColor"
@@ -292,15 +288,7 @@ export const EditorItem = (props: EditorItemProps) => {
             ></polyline>
           </svg>
         </button>
-        <button
-          id="layer-up"
-          onClick={() => {
-            setLayerByID(props.Item.ID, {
-              ...props.Item,
-              Layer: props.Item.Layer + 1,
-            });
-          }}
-        >
+        <button id="layer-up" onClick={() => moveLayerUp(props.Item.ID)}>
           <svg
             stroke="currentColor"
             fill="currentColor"
