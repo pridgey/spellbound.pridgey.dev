@@ -3,6 +3,7 @@ import { css } from "solid-styled";
 import { useDraggable, useResizable, useRotatable } from "~/utilities";
 import { GameItem, ResizeHandles } from "~/types";
 import mapState from "~/state/mapState";
+import { useMoveable } from "~/utilities/useMoveable/useMoveable";
 
 export type EditorItemProps = {
   Container: HTMLElement;
@@ -168,38 +169,42 @@ export const EditorItem = (props: EditorItemProps) => {
       },
     });
 
-  // Rotatable Hook
-  const { register: subscribeRotate, unregister: unsubscribeRotate } =
-    useRotatable((newAngle) => {
-      // setLayerByID(props.Item.ID, {
-      //   ...props.Item,
-      //   Rotation: newAngle,
-      // });
-    });
+  // // Rotatable Hook
+  // const { register: subscribeRotate, unregister: unsubscribeRotate } =
+  //   useRotatable((newAngle) => {
+  //     // setLayerByID(props.Item.ID, {
+  //     //   ...props.Item,
+  //     //   Rotation: newAngle,
+  //     // });
+  //   });
 
   // Item remounts when state updates
   onMount(() => {
     // Subscribe to the draggable hook
     subscribeDraggable(frameRef, props.Container);
-
     if (props.Item.Selected) {
       console.log("Attempting to focus", { itemRef });
       itemRef?.focus();
     }
-
     // const { register: registerResizable, unregister: unregisterResizable } =
     //   useResizable();
     // const { register: registerRotatable, unregister: unregisterRotatable } =
     //   useRotatable();
+
+    // const movableEvent = useMoveable(itemRef, props.Container);
+    // movableEvent.on("drag", (e) => {
+    //   itemRef.style.left = `${e.left}px`;
+    //   itemRef.style.top = `${e.top}px`;
+    // });
+    // movableEvent.on("dragEnd", () => console.log("Drag End"));
   });
 
   // Item runs cleanup as state updates
   onCleanup(() => {
     // Remove all draggable events
     unsubscribeDraggable();
-    // Remove rotate events
-    unsubscribeRotate();
-
+    // // Remove rotate events
+    // unsubscribeRotate();
     // unregisterResizable();
   });
 
@@ -313,7 +318,7 @@ export const EditorItem = (props: EditorItemProps) => {
         class="rotation"
         onMouseDown={(e) => {
           e.stopPropagation();
-          subscribeRotate(itemRef);
+          //subscribeRotate(itemRef);
         }}
       ></div>
     </ItemFrame>

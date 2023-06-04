@@ -1,5 +1,28 @@
 import { createSignal } from "solid-js";
 
+type useRotatableProps = {
+  OnRotateEnd?: (deg: number) => void;
+};
+
+/**
+ * Helper function to calculate the rotation based on initial mouse position and new mouse position
+ * @param x1 x value of first coordinate
+ * @param y1 y value of first coordinate
+ * @param x2 x value of second coordinate
+ * @param y2 y value of second coordinate
+ * @returns the calculated angle
+ */
+const getAngle = (x1: number, y1: number, x2: number, y2: number) => {
+  const opposite = y1 - y2;
+  const adjacent = x1 - x2;
+  const angle = Math.atan2(opposite, adjacent);
+  return angle * (180 / Math.PI);
+};
+
+export const useRotatable = () => {};
+
+// ==================================================
+
 type RotatableProps = {
   rotatableElement: HTMLElement | undefined;
   startingAngle: number;
@@ -18,26 +41,11 @@ const defaultState: RotatableProps = {
 };
 
 /**
- * Helper function to calculate the rotation based on initial mouse position and new mouse position
- * @param x1 x value of first coordinate
- * @param y1 y value of first coordinate
- * @param x2 x value of second coordinate
- * @param y2 y value of second coordinate
- * @returns the calculated angle
- */
-const getAngle = (x1: number, y1: number, x2: number, y2: number) => {
-  const opposite = y1 - y2;
-  const adjacent = x1 - x2;
-  const angle = Math.atan2(opposite, adjacent);
-  return angle * (180 / Math.PI);
-};
-
-/**
  * Hook to attach a rotatable functionality
  * @param OnRotateEnd Callback function to return the final rotation value
  * @returns subscribe and unsubscribe events to hook into the rotation
  */
-export const useRotatable = (OnRotateEnd: (angle: number) => void) => {
+export const useRotatable2 = (OnRotateEnd: (angle: number) => void) => {
   const [rotatableInfo, setRotatableInfo] =
     createSignal<RotatableProps>(defaultState);
 
