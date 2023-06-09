@@ -3,7 +3,6 @@ import { css } from "solid-styled";
 import { useDraggable, useResizable, useRotatable } from "~/utilities";
 import { GameItem, ResizeHandles } from "~/types";
 import mapState from "~/state/mapState";
-import { useMoveable } from "~/utilities/useMoveable/useMoveable";
 
 export type EditorItemProps = {
   Container: HTMLElement;
@@ -40,7 +39,7 @@ export const EditorItem = (props: EditorItemProps) => {
       height: 100%;
       user-select: none;
       cursor: move;
-      rotate: ${props.Item.Rotation.toString() ?? 0}deg;
+      rotate: ${`${props.Item.Rotation.toString() ?? 0}deg`};
       border: 0px;
     }
 
@@ -151,6 +150,7 @@ export const EditorItem = (props: EditorItemProps) => {
   // References to the element and its frame
   let frameRef: HTMLElement;
   let itemRef: HTMLElement;
+  let rotationHandleRef: HTMLElement;
 
   console.log("Render EditorItem:", { props });
 
@@ -169,27 +169,33 @@ export const EditorItem = (props: EditorItemProps) => {
       },
     });
 
-  // // Rotatable Hook
-  // const { register: subscribeRotate, unregister: unsubscribeRotate } =
-  //   useRotatable((newAngle) => {
-  //     // setLayerByID(props.Item.ID, {
-  //     //   ...props.Item,
-  //     //   Rotation: newAngle,
-  //     // });
-  //   });
+  // Rotatable Hook
+  const { subscribe: subscribeRotatable, unsubscribe: unsubscribeRotatable } =
+    useRotatable({
+      OnRotateEnd: (newRotation) => {
+        console.log("OnRotateEnd:", { newRotation });
+        if (newRotation !== props.Item.Rotation) {
+          setLayerByID(props.Item.ID, {
+            ...props.Item,
+            Rotation: newRotation,
+          });
+        }
+      },
+      ShiftAngleInterval: 15,
+    });
 
   // Item remounts when state updates
   onMount(() => {
     // Subscribe to the draggable hook
     subscribeDraggable(frameRef, props.Container);
+
+    // Subscribe to the rotatable hook
+    subscribeRotatable(itemRef, rotationHandleRef);
+
+    // Focus element if selected
     if (props.Item.Selected) {
-      console.log("Attempting to focus", { itemRef });
       itemRef?.focus();
     }
-    // const { register: registerResizable, unregister: unregisterResizable } =
-    //   useResizable();
-    // const { register: registerRotatable, unregister: unregisterRotatable } =
-    //   useRotatable();
 
     // const movableEvent = useMoveable(itemRef, props.Container);
     // movableEvent.on("drag", (e) => {
@@ -203,6 +209,10 @@ export const EditorItem = (props: EditorItemProps) => {
   onCleanup(() => {
     // Remove all draggable events
     unsubscribeDraggable();
+
+    // Remove rotation events
+    unsubscribeRotatable();
+
     // // Remove rotate events
     // unsubscribeRotate();
     // unregisterResizable();
@@ -316,6 +326,7 @@ export const EditorItem = (props: EditorItemProps) => {
       {/* Icon handle for rotating the item */}
       <div
         class="rotation"
+        ref={rotationHandleRef! as HTMLDivElement}
         onMouseDown={(e) => {
           e.stopPropagation();
           //subscribeRotate(itemRef);
