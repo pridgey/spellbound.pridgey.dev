@@ -77,7 +77,10 @@ export const useRotatable = (options?: useRotatableProps) => {
 
     // Grab current rotation of the element
     const currentRotation = Number(
-      element.style.getPropertyValue("rotate").replace("deg", "") ?? 0
+      window
+        .getComputedStyle(element)
+        .getPropertyValue("rotate")
+        .replace("deg", "") ?? 0
     );
 
     // Set the starting angle which will be subtracted from the move angle to determine rotation
