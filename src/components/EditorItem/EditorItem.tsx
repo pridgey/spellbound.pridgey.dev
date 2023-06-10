@@ -151,6 +151,10 @@ export const EditorItem = (props: EditorItemProps) => {
   let frameRef: HTMLElement;
   let itemRef: HTMLElement;
   let rotationHandleRef: HTMLElement;
+  let resizeTLRef: HTMLElement;
+  let resizeTRRef: HTMLElement;
+  let resizeBLRef: HTMLElement;
+  let resizeBRRef: HTMLElement;
 
   console.log("Render EditorItem:", { props });
 
@@ -184,6 +188,21 @@ export const EditorItem = (props: EditorItemProps) => {
       ShiftAngleInterval: 15,
     });
 
+  // Resizable Hook
+  const { subscribe: subscribeResizable, unsubscribe: unsubscribeResizable } =
+    useResizable({
+      OnResizeEnd: (width, height, left, top) => {
+        setLayerByID(props.Item.ID, {
+          ...props.Item,
+          Left: left,
+          Top: top,
+          Width: width,
+          Height: height,
+        });
+      },
+      MinimumSize: 100,
+    });
+
   // Item remounts when state updates
   onMount(() => {
     // Subscribe to the draggable hook
@@ -192,17 +211,20 @@ export const EditorItem = (props: EditorItemProps) => {
     // Subscribe to the rotatable hook
     subscribeRotatable(itemRef, rotationHandleRef);
 
+    // Subscribe to the resize handles
+    subscribeResizable(
+      frameRef,
+      props.Container,
+      resizeTLRef,
+      resizeTRRef,
+      resizeBLRef,
+      resizeBRRef
+    );
+
     // Focus element if selected
     if (props.Item.Selected) {
       itemRef?.focus();
     }
-
-    // const movableEvent = useMoveable(itemRef, props.Container);
-    // movableEvent.on("drag", (e) => {
-    //   itemRef.style.left = `${e.left}px`;
-    //   itemRef.style.top = `${e.top}px`;
-    // });
-    // movableEvent.on("dragEnd", () => console.log("Drag End"));
   });
 
   // Item runs cleanup as state updates
@@ -213,9 +235,8 @@ export const EditorItem = (props: EditorItemProps) => {
     // Remove rotation events
     unsubscribeRotatable();
 
-    // // Remove rotate events
-    // unsubscribeRotate();
-    // unregisterResizable();
+    // Remove resize events
+    unsubscribeResizable();
   });
 
   const ItemFrame = (props: any) => (
@@ -223,6 +244,15 @@ export const EditorItem = (props: EditorItemProps) => {
       {props.children}
     </div>
   );
+
+  const handleRefs: Record<ResizeHandles, HTMLElement> = {
+    "top-left": resizeTLRef!,
+    "top-right": resizeTRRef!,
+    "bottom-left": resizeBLRef!,
+    "bottom-right": resizeBRRef!,
+  };
+
+  console.log("REF!", { resizeTLRef });
 
   return (
     <ItemFrame Item={props.Item}>
@@ -237,23 +267,20 @@ export const EditorItem = (props: EditorItemProps) => {
         ref={itemRef! as HTMLButtonElement}
       ></button>
       {/* Render each of the four scaling handles */}
-      <For each={["top-left", "top-right", "bottom-left", "bottom-right"]}>
+      <For
+        each={
+          [
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+          ] as ResizeHandles[]
+        }
+      >
         {(item) => (
           <div
+            ref={handleRefs[item]! as HTMLDivElement}
             class={`resizable ${item}`}
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              const resizedElement = frameRef;
-              const container = document.getElementById("editor-screen")!;
-
-              // registerResizable(
-              //   item as ResizeHandles,
-              //   resizedElement,
-              //   container,
-              //   e.clientX,
-              //   e.clientY
-              // );
-            }}
           ></div>
         )}
       </For>

@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 import { ResizeHandles } from "~/types";
 
 type useResizableProps = {
+  MinimumSize: number;
   OnResizeEnd?: (
     width: number,
     height: number,
@@ -22,247 +23,336 @@ export const useResizable = (options?: useResizableProps) => {
   /* ----- Initialization ----- */
   // The element being resized
   let element: HTMLElement;
+  // The element's container
+  let containerElement: HTMLElement;
   // The handle elements
   let handle_topLeft: HTMLElement;
   let handle_topRight: HTMLElement;
   let handle_bottomLeft: HTMLElement;
   let handle_bottomRight: HTMLElement;
 
+  // Initial mouse position
+  let initialMouseX: number = 0;
+  let initialMouseY: number = 0;
+
+  // Element initial data
+  let elementInitialData: {
+    width: number;
+    height: number;
+    left: number;
+    top: number;
+  };
+
+  // Container bounds
+  let containerBounds: {
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
+  };
+
+  // As small as we can resize
+  let minimumSize = options?.MinimumSize || 100;
+
   // Are we in resize mode?
   let isResizing = false;
+  // Which handle is being dragged
+  let resizeType: ResizeHandles;
+
+  // Initialize element data
+  const initializeElements = (
+    newElement: HTMLElement,
+    newContainer: HTMLElement,
+    newTLHandle: HTMLElement,
+    newTRHandle: HTMLElement,
+    newBLHandle: HTMLElement,
+    newBRHandle: HTMLElement
+  ) => {
+    element = newElement;
+    containerElement = newContainer;
+    handle_topLeft = newTLHandle;
+    handle_topRight = newTRHandle;
+    handle_bottomLeft = newBLHandle;
+    handle_bottomRight = newBRHandle;
+
+    // Calculate data for element
+    const elementBoundData = newElement.getBoundingClientRect();
+    elementInitialData = {
+      width: elementBoundData.width,
+      height: elementBoundData.height,
+      left: elementBoundData.x,
+      top: elementBoundData.y,
+    };
+
+    // Calculate data for container
+    const containerBoundData = newContainer.getBoundingClientRect();
+    containerBounds = {
+      x1: containerBoundData.x,
+      x2: containerBoundData.x + containerBoundData.width,
+      y1: containerBoundData.y,
+      y2: containerBoundData.y + containerBoundData.height,
+    };
+
+    setResizeData({
+      width: elementBoundData.width,
+      height: elementBoundData.height,
+      top: elementBoundData.top,
+      left: elementBoundData.left,
+    });
+  };
 
   /* ----- Event Handlers ----- */
   // mouseDown event for each handle
+  const mouseDown = (e: MouseEvent, handle: ResizeHandles) => {
+    // Prevent other events from firing
+    e.stopPropagation();
 
-  // one mouseMove
+    // Mark as resizing
+    isResizing = true;
+    // Mark the resize type
+    resizeType = handle;
 
-  // one mouseUp
-};
+    // Get initial mouse position
+    initialMouseX = e.clientX;
+    initialMouseY = e.clientY;
+  };
+  const handleTopLeftDown = (e: MouseEvent) => {
+    mouseDown(e, "top-left");
+  };
+  const handleTopRightDown = (e: MouseEvent) => {
+    mouseDown(e, "top-right");
+  };
+  const handleBottomLeftDown = (e: MouseEvent) => {
+    mouseDown(e, "bottom-left");
+  };
+  const handleBottomRightDown = (e: MouseEvent) => {
+    mouseDown(e, "bottom-right");
+  };
 
-// =======================================================
+  // Event to handle mouse moving, causing resize
+  const handleMouseMove = (e: MouseEvent) => {
+    // Exit early if we aren't resizing
+    if (!isResizing) return;
 
-type ResizableProps = {
-  handle: ResizeHandles;
-  resizableElement: HTMLElement;
-  containerElement: HTMLElement;
-  mouseStartX: number;
-  mouseStartY: number;
-  elementStartX: number;
-  elementStartY: number;
-  elementStartWidth: number;
-  elementStartHeight: number;
-};
+    // Current position of the mouse
+    const currentMouseX = e.clientX;
+    const currentMouseY = e.clientY;
 
-export const useResizable_LEGACY = () => {
-  const [resizableElement, setResizableElement] =
-    createSignal<ResizableProps>();
+    // Apply logic based on handle
+    switch (resizeType) {
+      // Calculate resize logic for top-left handle
+      case "top-left": {
+        // item's new width
+        let newWidth = elementInitialData.width - currentMouseX - initialMouseX;
+        // item's new height
+        let newHeight =
+          elementInitialData.height - currentMouseY - initialMouseY;
+        // item's new left
+        let newLeft = elementInitialData.left + currentMouseX - initialMouseX;
+        // item's new top
+        let newTop = elementInitialData.top + currentMouseY - initialMouseY;
 
-  // The minimum size for scaling
-  const minimumDimension = 100;
+        // Calculate minimum sizing: width
+        if (newWidth < minimumSize) newWidth = minimumSize;
+        if (newWidth > containerBounds.x2) newWidth = containerBounds.x2;
+        // Calculate minimum sizing: height
+        if (newHeight < minimumSize) newHeight = minimumSize;
+        if (newHeight > containerBounds.y2) newHeight = containerBounds.y2;
 
-  const resize = (event: MouseEvent) => {
-    const data = resizableElement();
-    if (data?.containerElement) {
-      // Current size of the element
-      const resizedElementBox = data.resizableElement.getBoundingClientRect();
+        // Set styles to the element
+        // Set width
+        if (newLeft > containerBounds.x1) element.style.width = `${newWidth}px`;
+        // Set height
+        if (newTop > containerBounds.y1)
+          element.style.height = `${newHeight}px`;
 
-      // Current position of the mouse
-      const mouseX = event.clientX;
-      const mouseY = event.clientY;
+        // Don't scale beyond the container bounds
+        if (newLeft < containerBounds.x1) newLeft = containerBounds.x1;
+        if (newWidth > minimumSize) element.style.left = `${newLeft}px`;
+        if (newTop < containerBounds.y1) newLeft = containerBounds.y1;
+        if (newHeight > minimumSize) element.style.top = `${newTop}px`;
 
-      // The container boundaries
-      const containerMinimumX = 0;
-      const containerMinimumY = 0;
-      const containerBox = data.containerElement.getBoundingClientRect();
-      const containerMaximumX = containerBox.width;
-      const containerMaximumY = containerBox.height;
+        setResizeData((prev) => {
+          return {
+            ...prev,
+            width: newWidth,
+            height: newHeight,
+            top: newTop,
+            left: newLeft,
+          };
+        });
 
-      switch (data.handle) {
-        case "top-left":
-          // Calculate new dimensions and set element styles
-          let topLeftWidth =
-            data.elementStartWidth - (mouseX - data.mouseStartX);
-          // Calculate height
-          let topLeftHeight =
-            data.elementStartHeight - (mouseY - data.mouseStartY);
-          // Calculate Left position
-          let topLeftX = data.elementStartX + (mouseX - data.mouseStartX);
-          // Calculate Top position
-          let topLeftY = data.elementStartY + (mouseY - data.mouseStartY);
+        break;
+      }
+      // Calculate resize logic for top-right handle
+      case "top-right": {
+        // item's new width
+        let newWidth = elementInitialData.width + currentMouseX - initialMouseX;
+        // item's new height
+        let newHeight =
+          elementInitialData.height - currentMouseY - initialMouseY;
+        // item's new top
+        let newTop = elementInitialData.top + currentMouseY - initialMouseY;
 
-          // Minimum size for scaling
-          if (topLeftWidth < minimumDimension) {
-            topLeftWidth = minimumDimension;
-          }
-          // Element width shouldn't be more than container width
-          if (topLeftWidth > containerMaximumX) {
-            topLeftWidth = containerMaximumX;
-          }
-          // Set Width (if we are still within container boundaries)
-          if (topLeftX > containerMinimumX) {
-            data.resizableElement.style.width = `${topLeftWidth}px`;
-          }
+        // Calculate minimum sizing: width
+        if (newWidth + elementInitialData.left > containerBounds.x2)
+          newWidth = containerBounds.x2 - elementInitialData.left;
+        if (newWidth < minimumSize) newWidth = minimumSize;
+        // Calculate minimum sizing: height
+        if (newHeight < minimumSize) newHeight = minimumSize;
+        // Check if top is within container bounds
+        if (newTop < containerBounds.y1) newTop = containerBounds.y1;
 
-          // Minimum size for scaling
-          if (topLeftHeight < minimumDimension) {
-            topLeftHeight = minimumDimension;
-          }
-          // Element height shouldn't be more than container height
-          if (topLeftHeight > containerMaximumY) {
-            topLeftHeight = containerMaximumY;
-          }
-          // Set Height (if we are still within container boundaries)
-          if (topLeftY > containerMinimumY) {
-            data.resizableElement.style.height = `${topLeftHeight}px`;
-          }
+        // Set element styles
+        element.style.width = `${newWidth}px`;
+        if (newTop > containerBounds.y1)
+          element.style.height = `${newHeight}px`;
+        if (newHeight > minimumSize) element.style.top = `${newTop}px`;
 
-          // Don't scale beyond boundaries
-          if (topLeftX < containerMinimumX) {
-            topLeftX = containerMinimumX;
-          }
-          // If we hit minimum width, don't push left
-          if (topLeftWidth > minimumDimension) {
-            data.resizableElement.style.left = `${topLeftX}px`;
-          }
-          // Don't scale beyond boundaries
-          if (topLeftY < containerMinimumY) {
-            topLeftY = containerMinimumY;
-          }
-          // If we hit m inimum height, don't push down
-          if (topLeftHeight > minimumDimension) {
-            data.resizableElement.style.top = `${topLeftY}px`;
-          }
-          break;
-        case "top-right":
-          // Calculate new dimensions and set element styles
-          let topRightWidth =
-            data.elementStartWidth + (mouseX - data.mouseStartX);
-          let topRightHeight =
-            data.elementStartHeight - (mouseY - data.mouseStartY);
-          let topRightY = data.elementStartY + (mouseY - data.mouseStartY);
+        setResizeData((prev) => {
+          return {
+            ...prev,
+            width: newWidth,
+            height: newHeight,
+            top: newTop,
+          };
+        });
 
-          if (topRightWidth + data.elementStartX > containerMaximumX) {
-            topRightWidth = containerMaximumX - data.elementStartX;
-          }
-          if (topRightWidth < minimumDimension) {
-            topRightWidth = minimumDimension;
-          }
-          if (topRightHeight < minimumDimension) {
-            topRightHeight = minimumDimension;
-          }
-          if (topRightY < containerMinimumY) {
-            topRightY = containerMinimumY;
-          }
+        break;
+      }
+      // Calculate resize logic for bottom-left handle
+      case "bottom-left": {
+        // item's new width
+        let newWidth = elementInitialData.width - currentMouseX - initialMouseX;
+        // item's new height
+        let newHeight =
+          elementInitialData.height + currentMouseY - initialMouseY;
+        // item's new left
+        let newLeft = elementInitialData.left + currentMouseX - initialMouseX;
 
-          data.resizableElement.style.width = `${topRightWidth}px`;
-          if (topRightY > containerMinimumY) {
-            data.resizableElement.style.height = `${topRightHeight}px`;
-          }
-          if (topRightHeight > minimumDimension) {
-            data.resizableElement.style.top = `${topRightY}px`;
-          }
-          break;
-        case "bottom-left":
-          // Calculate new dimensions and set element styles
-          let bottomLeftWidth =
-            data.elementStartWidth - (mouseX - data.mouseStartX);
-          let bottomLeftHeight =
-            data.elementStartHeight + (mouseY - data.mouseStartY);
-          let bottomLeftX = data.elementStartX + (mouseX - data.mouseStartX);
+        // Calculate minimum sizing: width
+        if (newWidth < minimumSize) newWidth = minimumSize;
+        // Calculate minimum sizing: height
+        if (newHeight < minimumSize) newHeight = minimumSize;
+        // Calculate boundaries: left
+        if (newLeft < containerBounds.x1) newLeft = containerBounds.x1;
+        // Calculate boundaries: height
+        if (newHeight + elementInitialData.top > containerBounds.y2)
+          newHeight = containerBounds.y2 - elementInitialData.top;
 
-          if (bottomLeftWidth < minimumDimension) {
-            bottomLeftWidth = minimumDimension;
-          }
-          if (bottomLeftHeight < minimumDimension) {
-            bottomLeftHeight = minimumDimension;
-          }
-          if (bottomLeftX < containerMinimumX) {
-            bottomLeftX = containerMinimumX;
-          }
-          if (bottomLeftHeight + data.elementStartY > containerMaximumY) {
-            bottomLeftHeight = containerMaximumY - data.elementStartY;
-          }
+        // Set element styles
+        if (newLeft > containerBounds.x1) element.style.width = `${newWidth}px`;
+        element.style.height = `${newHeight}px`;
+        if (newWidth > minimumSize) element.style.left = `${newLeft}px`;
 
-          if (bottomLeftX > containerMinimumX) {
-            data.resizableElement.style.width = `${bottomLeftWidth}px`;
-          }
-          data.resizableElement.style.height = `${bottomLeftHeight}px`;
-          if (bottomLeftWidth > minimumDimension) {
-            data.resizableElement.style.left = `${bottomLeftX}px`;
-          }
-          break;
-        case "bottom-right":
-          // Calculate new dimensions and set element styles
-          let bottomRightWidth =
-            data.elementStartWidth + (mouseX - data.mouseStartX);
-          let bottomRightHeight =
-            data.elementStartHeight + (mouseY - data.mouseStartY);
+        setResizeData((prev) => {
+          return {
+            ...prev,
+            width: newWidth,
+            height: newHeight,
+            left: newLeft,
+          };
+        });
 
-          if (bottomRightWidth + data.elementStartX > containerMaximumX) {
-            bottomRightWidth = containerMaximumX - data.elementStartX;
-          }
+        break;
+      }
+      // Calculate resize logic for bottom-right handle
+      case "bottom-right": {
+        // item's new width
+        let newWidth = elementInitialData.width + currentMouseX - initialMouseX;
+        // item's new height
+        let newHeight =
+          elementInitialData.height + currentMouseY - initialMouseY;
 
-          if (bottomRightWidth < minimumDimension) {
-            bottomRightWidth = minimumDimension;
-          }
+        // Calculate bounds
+        if (newWidth + elementInitialData.left > containerBounds.x2)
+          newWidth = containerBounds.x2 - elementInitialData.left;
+        // Calculate minimum sizing: width
+        if (newWidth < minimumSize) newWidth = minimumSize;
+        // Calculate minimum sizing: height
+        if (newHeight < minimumSize) newHeight = minimumSize;
 
-          if (bottomRightHeight < minimumDimension) {
-            bottomRightHeight = minimumDimension;
-          }
+        // Set element styles
+        if (newHeight + elementInitialData.top > containerBounds.y2)
+          newHeight = containerBounds.y2 - elementInitialData.top;
+        element.style.width = `${newWidth}px`;
+        element.style.height = `${newHeight}px`;
 
-          if (bottomRightHeight + data.elementStartY > containerMaximumY) {
-            bottomRightHeight = containerMaximumY - data.elementStartY;
-          }
+        setResizeData((prev) => {
+          return {
+            ...prev,
+            width: newWidth,
+            height: newHeight,
+          };
+        });
 
-          data.resizableElement.style.width = `${bottomRightWidth}px`;
-          data.resizableElement.style.height = `${bottomRightHeight}px`;
-          break;
+        break;
       }
     }
   };
 
-  const unregister = () => {
-    setResizableElement();
-    document?.documentElement?.removeEventListener("mousemove", resize);
-  };
-
-  const register = (
-    handle: ResizeHandles,
-    element: HTMLElement,
-    container: HTMLElement,
-    mouseStartX: number,
-    mouseStartY: number
-  ) => {
-    if (!element || !container || !handle) {
-      return;
+  // Event to handle when mouse is released
+  const handleMouseUp = () => {
+    if (isResizing) {
+      const data = resizeData();
+      options?.OnResizeEnd?.(data.width, data.height, data.left, data.top);
+      isResizing = false;
     }
-
-    const elementBox = element.getBoundingClientRect();
-    const containerBox = container.getBoundingClientRect();
-
-    const elementStartX = elementBox.left - containerBox.left;
-    const elementStartY = elementBox.top - containerBox.top;
-    const elementStartWidth = elementBox.width;
-    const elementStartHeight = elementBox.height;
-
-    setResizableElement({
-      handle,
-      resizableElement: element,
-      containerElement: container,
-      mouseStartX,
-      mouseStartY,
-      elementStartX,
-      elementStartY,
-      elementStartWidth,
-      elementStartHeight,
-    });
-
-    document?.documentElement?.addEventListener("mousemove", resize);
-    document?.documentElement?.addEventListener("mouseup", unregister);
   };
 
   return {
-    register,
-    unregister,
+    subscribe: (
+      resizableElement: HTMLElement,
+      container: HTMLElement,
+      handleTL: HTMLElement,
+      handleTR: HTMLElement,
+      handleBL: HTMLElement,
+      handleBR: HTMLElement
+    ) => {
+      if (
+        resizableElement &&
+        container &&
+        handleTL &&
+        handleTR &&
+        handleBL &&
+        handleBR
+      ) {
+        // Initialize!
+        initializeElements(
+          resizableElement,
+          container,
+          handleTL,
+          handleTR,
+          handleBL,
+          handleBR
+        );
+
+        handleTL.addEventListener("mousedown", handleTopLeftDown);
+        handleTR.addEventListener("mousedown", handleTopRightDown);
+        handleBL.addEventListener("mousedown", handleBottomLeftDown);
+        handleBR.addEventListener("mousedown", handleBottomRightDown);
+        document.addEventListener("mouseup", handleMouseUp);
+        document.addEventListener("mousemove", handleMouseMove);
+      }
+    },
+    unsubscribe: () => {
+      if (handle_topLeft)
+        handle_topLeft.removeEventListener("mousedown", handleTopLeftDown);
+      if (handle_topRight)
+        handle_topRight.removeEventListener("mousedown", handleTopRightDown);
+      if (handle_bottomLeft)
+        handle_bottomLeft.removeEventListener(
+          "mousedown",
+          handleBottomLeftDown
+        );
+      if (handle_bottomRight)
+        handle_bottomRight.removeEventListener(
+          "mousedown",
+          handleBottomRightDown
+        );
+
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+    },
   };
 };
