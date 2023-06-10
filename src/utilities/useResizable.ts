@@ -1,6 +1,46 @@
 import { createSignal } from "solid-js";
 import { ResizeHandles } from "~/types";
 
+type useResizableProps = {
+  OnResizeEnd?: (
+    width: number,
+    height: number,
+    left: number,
+    top: number
+  ) => void;
+};
+
+export const useResizable = (options?: useResizableProps) => {
+  // Current size and positioning
+  const [resizeData, setResizeData] = createSignal({
+    width: 0,
+    height: 0,
+    left: 0,
+    top: 0,
+  });
+
+  /* ----- Initialization ----- */
+  // The element being resized
+  let element: HTMLElement;
+  // The handle elements
+  let handle_topLeft: HTMLElement;
+  let handle_topRight: HTMLElement;
+  let handle_bottomLeft: HTMLElement;
+  let handle_bottomRight: HTMLElement;
+
+  // Are we in resize mode?
+  let isResizing = false;
+
+  /* ----- Event Handlers ----- */
+  // mouseDown event for each handle
+
+  // one mouseMove
+
+  // one mouseUp
+};
+
+// =======================================================
+
 type ResizableProps = {
   handle: ResizeHandles;
   resizableElement: HTMLElement;
@@ -13,7 +53,7 @@ type ResizableProps = {
   elementStartHeight: number;
 };
 
-export const useResizable = () => {
+export const useResizable_LEGACY = () => {
   const [resizableElement, setResizableElement] =
     createSignal<ResizableProps>();
 
