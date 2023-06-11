@@ -143,6 +143,8 @@ export const useResizable = (options?: useResizableProps) => {
     const currentMouseY = e.clientY;
 
     // Exit early if we're out of bounds
+    // This isn't a great way of doing this because it cause jittering when you pull towards the left or top
+    // Instead we should find a way of preventing width / height growth when mouse is out of bounds
     if (
       currentMouseX < containerBounds.left ||
       currentMouseY < containerBounds.top

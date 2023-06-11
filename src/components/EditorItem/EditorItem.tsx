@@ -1,8 +1,15 @@
-import { onCleanup, For, onMount, createEffect } from "solid-js";
+import { onCleanup, onMount, Switch, Match } from "solid-js";
 import { css } from "solid-styled";
 import { useDraggable, useResizable, useRotatable } from "~/utilities";
-import { GameItem, ResizeHandles } from "~/types";
+import { GameItem } from "~/types";
 import mapState from "~/state/mapState";
+import {
+  AiOutlineCompress,
+  AiOutlineDown,
+  AiOutlineExpand,
+  AiOutlineUp,
+} from "solid-icons/ai";
+import { FiRotateCcw } from "solid-icons/fi";
 
 export type EditorItemProps = {
   Container: HTMLElement;
@@ -86,9 +93,14 @@ export const EditorItem = (props: EditorItemProps) => {
       color: black;
     }
 
-    .toolbar button svg {
-      width: 1.5rem;
-      height: 1.5rem;
+    .toolbar_button {
+      font-size: 2rem;
+    }
+
+    .toolbar > button > svg {
+      width: 2rem;
+      height: 2rem;
+      font-size: 2rem;
     }
 
     /* The hover effect of the toolbar's buttons */
@@ -203,7 +215,6 @@ export const EditorItem = (props: EditorItemProps) => {
 
   // Item remounts when state updates
   onMount(() => {
-    console.log("REF!", { resizeTLRef });
     // Subscribe to the draggable hook
     subscribeDraggable(frameRef, props.Container);
 
@@ -257,10 +268,10 @@ export const EditorItem = (props: EditorItemProps) => {
         ref={itemRef! as HTMLButtonElement}
       ></button>
       {/* Render each of the four scaling handles */}
-      <div ref={resizeTLRef!} class={`resizable top-left`}></div>
-      <div ref={resizeTRRef!} class={`resizable top-right`}></div>
-      <div ref={resizeBLRef!} class={`resizable bottom-left`}></div>
-      <div ref={resizeBRRef!} class={`resizable bottom-right`}></div>
+      <div ref={resizeTLRef!} class="resizable top-left"></div>
+      <div ref={resizeTRRef!} class="resizable top-right"></div>
+      <div ref={resizeBLRef!} class="resizable bottom-left"></div>
+      <div ref={resizeBRRef!} class="resizable bottom-right"></div>
 
       {/* Toolbar of quick actions */}
       <div class="toolbar">
@@ -270,74 +281,28 @@ export const EditorItem = (props: EditorItemProps) => {
             // Set layer to full-screen
             setLayerByID(props.Item.ID, {
               ...props.Item,
-              Fullscreen: true,
+              Fullscreen: !props.Item.Fullscreen,
             } as unknown as GameItem);
           }}
         >
-          <svg
-            stroke="currentColor"
-            fill="currentColor"
-            stroke-width="0"
-            viewBox="0 0 24 24"
-            height="1em"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill="none"
-              stroke="#000"
-              stroke-width="2"
-              d="M10,14 L2,22 M1,15 L1,23 L9,23 M22,2 L14,10 M15,1 L23,1 L23,9"
-            ></path>
-          </svg>
+          <Switch>
+            <Match when={props.Item.Fullscreen}>
+              <AiOutlineCompress size={12} />
+            </Match>
+            <Match when={!props.Item.Fullscreen}>
+              <AiOutlineExpand size={12} />
+            </Match>
+          </Switch>
         </button>
         <button id="layer-down" onClick={() => moveLayerDown(props.Item.ID)}>
-          <svg
-            stroke="currentColor"
-            fill="currentColor"
-            stroke-width="0"
-            viewBox="0 0 24 24"
-            height="1em"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <polyline
-              fill="none"
-              stroke="#000"
-              stroke-width="2"
-              points="18 9 12 15 6 9"
-            ></polyline>
-          </svg>
+          <AiOutlineDown size={12} />
         </button>
         <button id="layer-up" onClick={() => moveLayerUp(props.Item.ID)}>
-          <svg
-            stroke="currentColor"
-            fill="currentColor"
-            stroke-width="0"
-            viewBox="0 0 24 24"
-            height="1em"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <polyline
-              fill="none"
-              stroke="#000"
-              stroke-width="2"
-              points="18 9 12 15 6 9"
-              transform="matrix(1 0 0 -1 0 24)"
-            ></polyline>
-          </svg>
+          <AiOutlineUp size={12} />
         </button>
       </div>
       {/* Icon handle for rotating the item */}
-      <div
-        class="rotation"
-        ref={rotationHandleRef! as HTMLDivElement}
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          //subscribeRotate(itemRef);
-        }}
-      ></div>
+      <div class="rotation" ref={rotationHandleRef! as HTMLDivElement}></div>
     </ItemFrame>
   );
 };
