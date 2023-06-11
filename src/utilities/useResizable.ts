@@ -49,6 +49,8 @@ export const useResizable = (options?: useResizableProps) => {
     x2: number;
     y1: number;
     y2: number;
+    left: number;
+    top: number;
   };
 
   // As small as we can resize
@@ -75,29 +77,31 @@ export const useResizable = (options?: useResizableProps) => {
     handle_bottomLeft = newBLHandle;
     handle_bottomRight = newBRHandle;
 
+    // Calculate data for container
+    const containerBoundData = newContainer.getBoundingClientRect();
+    containerBounds = {
+      x1: 0,
+      x2: containerBoundData.width,
+      y1: 0,
+      y2: containerBoundData.height,
+      left: containerBoundData.left,
+      top: containerBoundData.top,
+    };
+
     // Calculate data for element
     const elementBoundData = newElement.getBoundingClientRect();
     elementInitialData = {
       width: elementBoundData.width,
       height: elementBoundData.height,
-      left: elementBoundData.x,
-      top: elementBoundData.y,
-    };
-
-    // Calculate data for container
-    const containerBoundData = newContainer.getBoundingClientRect();
-    containerBounds = {
-      x1: containerBoundData.x,
-      x2: containerBoundData.x + containerBoundData.width,
-      y1: containerBoundData.y,
-      y2: containerBoundData.y + containerBoundData.height,
+      left: elementBoundData.left - containerBoundData.left,
+      top: elementBoundData.top - containerBoundData.top,
     };
 
     setResizeData({
       width: elementBoundData.width,
       height: elementBoundData.height,
-      top: elementBoundData.top,
-      left: elementBoundData.left,
+      left: elementBoundData.left - containerBoundData.left,
+      top: elementBoundData.top - containerBoundData.top,
     });
   };
 
@@ -138,19 +142,27 @@ export const useResizable = (options?: useResizableProps) => {
     const currentMouseX = e.clientX;
     const currentMouseY = e.clientY;
 
+    // Exit early if we're out of bounds
+    if (
+      currentMouseX < containerBounds.left ||
+      currentMouseY < containerBounds.top
+    )
+      return;
+
     // Apply logic based on handle
     switch (resizeType) {
       // Calculate resize logic for top-left handle
       case "top-left": {
         // item's new width
-        let newWidth = elementInitialData.width - currentMouseX - initialMouseX;
+        let newWidth =
+          elementInitialData.width - (currentMouseX - initialMouseX);
         // item's new height
         let newHeight =
-          elementInitialData.height - currentMouseY - initialMouseY;
+          elementInitialData.height - (currentMouseY - initialMouseY);
         // item's new left
-        let newLeft = elementInitialData.left + currentMouseX - initialMouseX;
+        let newLeft = elementInitialData.left + (currentMouseX - initialMouseX);
         // item's new top
-        let newTop = elementInitialData.top + currentMouseY - initialMouseY;
+        let newTop = elementInitialData.top + (currentMouseY - initialMouseY);
 
         // Calculate minimum sizing: width
         if (newWidth < minimumSize) newWidth = minimumSize;
@@ -169,7 +181,7 @@ export const useResizable = (options?: useResizableProps) => {
         // Don't scale beyond the container bounds
         if (newLeft < containerBounds.x1) newLeft = containerBounds.x1;
         if (newWidth > minimumSize) element.style.left = `${newLeft}px`;
-        if (newTop < containerBounds.y1) newLeft = containerBounds.y1;
+        if (newTop < containerBounds.y1) newTop = containerBounds.y1;
         if (newHeight > minimumSize) element.style.top = `${newTop}px`;
 
         setResizeData((prev) => {
@@ -187,12 +199,13 @@ export const useResizable = (options?: useResizableProps) => {
       // Calculate resize logic for top-right handle
       case "top-right": {
         // item's new width
-        let newWidth = elementInitialData.width + currentMouseX - initialMouseX;
+        let newWidth =
+          elementInitialData.width + (currentMouseX - initialMouseX);
         // item's new height
         let newHeight =
-          elementInitialData.height - currentMouseY - initialMouseY;
+          elementInitialData.height - (currentMouseY - initialMouseY);
         // item's new top
-        let newTop = elementInitialData.top + currentMouseY - initialMouseY;
+        let newTop = elementInitialData.top + (currentMouseY - initialMouseY);
 
         // Calculate minimum sizing: width
         if (newWidth + elementInitialData.left > containerBounds.x2)
@@ -223,12 +236,13 @@ export const useResizable = (options?: useResizableProps) => {
       // Calculate resize logic for bottom-left handle
       case "bottom-left": {
         // item's new width
-        let newWidth = elementInitialData.width - currentMouseX - initialMouseX;
+        let newWidth =
+          elementInitialData.width - (currentMouseX - initialMouseX);
         // item's new height
         let newHeight =
-          elementInitialData.height + currentMouseY - initialMouseY;
+          elementInitialData.height + (currentMouseY - initialMouseY);
         // item's new left
-        let newLeft = elementInitialData.left + currentMouseX - initialMouseX;
+        let newLeft = elementInitialData.left + (currentMouseX - initialMouseX);
 
         // Calculate minimum sizing: width
         if (newWidth < minimumSize) newWidth = minimumSize;
@@ -259,10 +273,11 @@ export const useResizable = (options?: useResizableProps) => {
       // Calculate resize logic for bottom-right handle
       case "bottom-right": {
         // item's new width
-        let newWidth = elementInitialData.width + currentMouseX - initialMouseX;
+        let newWidth =
+          elementInitialData.width + (currentMouseX - initialMouseX);
         // item's new height
         let newHeight =
-          elementInitialData.height + currentMouseY - initialMouseY;
+          elementInitialData.height + (currentMouseY - initialMouseY);
 
         // Calculate bounds
         if (newWidth + elementInitialData.left > containerBounds.x2)

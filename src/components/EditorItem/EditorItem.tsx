@@ -151,12 +151,10 @@ export const EditorItem = (props: EditorItemProps) => {
   let frameRef: HTMLElement;
   let itemRef: HTMLElement;
   let rotationHandleRef: HTMLElement;
-  let resizeTLRef: HTMLElement;
-  let resizeTRRef: HTMLElement;
-  let resizeBLRef: HTMLElement;
-  let resizeBRRef: HTMLElement;
-
-  console.log("Render EditorItem:", { props });
+  let resizeTLRef: HTMLDivElement;
+  let resizeTRRef: HTMLDivElement;
+  let resizeBLRef: HTMLDivElement;
+  let resizeBRRef: HTMLDivElement;
 
   // Draggable Hook
   const { subscribe: subscribeDraggable, unsubscribe: unsubscribeDraggable } =
@@ -205,6 +203,7 @@ export const EditorItem = (props: EditorItemProps) => {
 
   // Item remounts when state updates
   onMount(() => {
+    console.log("REF!", { resizeTLRef });
     // Subscribe to the draggable hook
     subscribeDraggable(frameRef, props.Container);
 
@@ -245,15 +244,6 @@ export const EditorItem = (props: EditorItemProps) => {
     </div>
   );
 
-  const handleRefs: Record<ResizeHandles, HTMLElement> = {
-    "top-left": resizeTLRef!,
-    "top-right": resizeTRRef!,
-    "bottom-left": resizeBLRef!,
-    "bottom-right": resizeBRRef!,
-  };
-
-  console.log("REF!", { resizeTLRef });
-
   return (
     <ItemFrame Item={props.Item}>
       <button
@@ -267,26 +257,15 @@ export const EditorItem = (props: EditorItemProps) => {
         ref={itemRef! as HTMLButtonElement}
       ></button>
       {/* Render each of the four scaling handles */}
-      <For
-        each={
-          [
-            "top-left",
-            "top-right",
-            "bottom-left",
-            "bottom-right",
-          ] as ResizeHandles[]
-        }
-      >
-        {(item) => (
-          <div
-            ref={handleRefs[item]! as HTMLDivElement}
-            class={`resizable ${item}`}
-          ></div>
-        )}
-      </For>
+      <div ref={resizeTLRef!} class={`resizable top-left`}></div>
+      <div ref={resizeTRRef!} class={`resizable top-right`}></div>
+      <div ref={resizeBLRef!} class={`resizable bottom-left`}></div>
+      <div ref={resizeBRRef!} class={`resizable bottom-right`}></div>
+
       {/* Toolbar of quick actions */}
       <div class="toolbar">
         <button
+          id="full-screen"
           onClick={() => {
             // Set layer to full-screen
             setLayerByID(props.Item.ID, {
