@@ -1,0 +1,51 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: white;
+  font-size: 2rem;
+}
+
+.layersHeader {
+  display: grid;
+  grid-template:
+    "title title title" 4rem
+    ". up down" min-content / 1fr min-content min-content;
+  gap: 2rem;
+  padding: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid white;
+}
+
+.headerTitle {
+  grid-area: title;
+  font-weight: bold;
+  font-family: Srisakdi;
+  font-size: 4rem;
+  color: white;
+  margin: 0px;
+}
+
+.headerButton {
+  border: 0px;
+  background-color: transparent;
+  padding: 1rem;
+}
+
+.layersWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0px 2rem;
+}
+
+.layerItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  font-size: 2rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid white;
+  border-radius: 2rem;
+}

@@ -22,10 +22,10 @@ const createMapState = () => {
       ID: "1",
       ImageURL: "images/sample-2.png",
       Layer: 1,
-      Left: 0,
+      Left: 50,
       Rotation: 0,
       Selected: false,
-      Top: 0,
+      Top: 50,
       Width: 200,
     },
     {
@@ -34,10 +34,10 @@ const createMapState = () => {
       ID: "2",
       ImageURL: "images/sample-3.png",
       Layer: 2,
-      Left: 0,
+      Left: 100,
       Rotation: 0,
       Selected: false,
-      Top: 0,
+      Top: 100,
       Width: 200,
     },
     {
@@ -46,10 +46,10 @@ const createMapState = () => {
       ID: "3",
       ImageURL: "images/sample-4.png",
       Layer: 2,
-      Left: 0,
+      Left: 200,
       Rotation: 0,
       Selected: false,
-      Top: 0,
+      Top: 200,
       Width: 200,
     },
   ]);
@@ -145,12 +145,29 @@ const createMapState = () => {
     });
   };
 
+  /**
+   * Selects specified layer, unselecting all others
+   * @param id The id of the layer to select
+   */
+  const selectLayer = (id: string) => {
+    const layers = [...currentLayers()];
+    layers.forEach((layer) => {
+      layer.Selected = false;
+    });
+
+    const newSelectedLayer = layers.find((layer) => layer.ID === id);
+    if (newSelectedLayer) newSelectedLayer.Selected = true;
+
+    setCurrentLayers([...layers]);
+  };
+
   // Return all the stuff from the store
   return {
     currentLayers,
     getLayer,
     setLayer,
     setLayerByID,
+    selectLayer,
     moveLayerUp,
     moveLayerDown,
   };

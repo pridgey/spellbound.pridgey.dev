@@ -116,6 +116,9 @@ const Game = () => {
               ...currentLayers().map((layer) => ({ ID: layer.ID })),
             ].reverse() as unknown as Pick<GameItem, "ID">[]
           }
+          SelectedLayer={
+            currentLayers().find((layer) => layer.Selected)?.ID ?? ""
+          }
         />
       </aside>
     </main>

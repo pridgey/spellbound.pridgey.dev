@@ -9,7 +9,6 @@ import {
   AiOutlineExpand,
   AiOutlineUp,
 } from "solid-icons/ai";
-import { FiRotateCcw } from "solid-icons/fi";
 
 export type EditorItemProps = {
   Container: HTMLElement;
@@ -171,7 +170,7 @@ export const EditorItem = (props: EditorItemProps) => {
   `;
 
   // Current map layer stateful actions
-  const { setLayerByID, moveLayerUp, moveLayerDown } = mapState;
+  const { setLayerByID, moveLayerUp, moveLayerDown, selectLayer } = mapState;
 
   // References to the element and its frame
   let frameRef: HTMLElement;
@@ -191,8 +190,8 @@ export const EditorItem = (props: EditorItemProps) => {
             ...props.Item,
             Left: x,
             Top: y,
-            Selected: true,
           });
+          selectLayer(props.Item.ID);
         }
       },
     });
@@ -201,12 +200,12 @@ export const EditorItem = (props: EditorItemProps) => {
   const { subscribe: subscribeRotatable, unsubscribe: unsubscribeRotatable } =
     useRotatable({
       OnRotateEnd: (newRotation) => {
-        console.log("OnRotateEnd:", { newRotation });
         if (newRotation !== props.Item.Rotation) {
           setLayerByID(props.Item.ID, {
             ...props.Item,
             Rotation: newRotation,
           });
+          selectLayer(props.Item.ID);
         }
       },
       ShiftAngleInterval: 15,
@@ -223,6 +222,7 @@ export const EditorItem = (props: EditorItemProps) => {
           Width: width,
           Height: height,
         });
+        selectLayer(props.Item.ID);
       },
       MinimumSize: 100,
     });
