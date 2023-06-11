@@ -1,7 +1,8 @@
 import { css } from "solid-styled";
-import { EditorScreen } from "~/components";
+import { EditorScreen, MapLayers } from "~/components";
 import { GameItem } from "~/types";
 import mapState from "~/state/mapState";
+import { For } from "solid-js";
 
 const Game = () => {
   css`
@@ -108,7 +109,15 @@ const Game = () => {
       <div class="map-container">
         <EditorScreen MapLayers={currentLayers()} />
       </div>
-      <aside class="sidebar"></aside>
+      <aside class="sidebar">
+        <MapLayers
+          Layers={
+            [
+              ...currentLayers().map((layer) => ({ ID: layer.ID })),
+            ].reverse() as unknown as Pick<GameItem, "ID">[]
+          }
+        />
+      </aside>
     </main>
   );
 };

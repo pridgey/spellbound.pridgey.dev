@@ -26,6 +26,7 @@ export const EditorItem = (props: EditorItemProps) => {
       border-radius: 100%;
       background-color: white;
       user-select: none;
+      z-index: 2;
     }
 
     .frame {
@@ -64,7 +65,7 @@ export const EditorItem = (props: EditorItemProps) => {
       border-radius: 100%;
       background-repeat: no-repeat;
       cursor: url("/images/rotate.svg"), auto;
-      z-index: 2;
+      z-index: 3;
     }
 
     /* Toolbar styling */
@@ -78,7 +79,7 @@ export const EditorItem = (props: EditorItemProps) => {
       flex-direction: row;
       border-radius: 2rem;
       overflow: hidden;
-      z-index: 2;
+      z-index: 3;
     }
 
     /* Toolbar button styling */
@@ -108,6 +109,18 @@ export const EditorItem = (props: EditorItemProps) => {
       background-color: #ecebeb;
     }
 
+    .selection {
+      display: none;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      border: 1px dashed white;
+      z-index: 2;
+      user-select: none;
+    }
+
     /* Removes the outline that comes from holding shift */
     .frame:focus-visible,
     .item:focus-visible {
@@ -116,7 +129,7 @@ export const EditorItem = (props: EditorItemProps) => {
 
     /* Shows a border around the item frame */
     .frame:focus-within {
-      border: 1px solid white;
+      border: 0px solid white;
       outline: 0px;
     }
 
@@ -127,7 +140,8 @@ export const EditorItem = (props: EditorItemProps) => {
 
     /* Show scale handles and rotation handle when item frame is focused */
     .frame:focus-within .resizable,
-    .frame:focus-within .rotation {
+    .frame:focus-within .rotation,
+    .frame:focus-within .selection {
       display: block;
     }
 
@@ -303,6 +317,8 @@ export const EditorItem = (props: EditorItemProps) => {
       </div>
       {/* Icon handle for rotating the item */}
       <div class="rotation" ref={rotationHandleRef! as HTMLDivElement}></div>
+      {/* The outline around the frame when selected, shows through layers above */}
+      <div class="selection"></div>
     </ItemFrame>
   );
 };
