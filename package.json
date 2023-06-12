@@ -3,7 +3,9 @@
   "scripts": {
     "dev": "solid-start dev",
     "build": "solid-start build",
-    "start": "solid-start start"
+    "start": "solid-start start",
+    "type-css": "tcm src",
+    "type-css-watch": "tcm src -w"
   },
   "type": "module",
   "devDependencies": {
@@ -20,6 +22,7 @@
     "solid-start": "^0.2.21",
     "solid-styled": "^0.7.4",
     "solid-styled-components": "^0.28.5",
+    "typed-css-modules": "^0.7.2",
     "undici": "^5.15.1"
   },
   "engines": {

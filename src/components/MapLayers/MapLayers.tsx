@@ -8,13 +8,14 @@ import mapState from "~/state/mapState";
 import { GameItem } from "~/types";
 import styles from "./MapLayers.module.css";
 
-type MapLayersProps = {
-  Layers: Pick<GameItem, "ID">[];
-  SelectedLayer: string;
-};
-
-export const MapLayers = (props: MapLayersProps) => {
-  const { moveLayerDown, moveLayerUp, currentLayers } = mapState;
+export const MapLayers = () => {
+  const {
+    moveLayerDown,
+    moveLayerUp,
+    currentLayers,
+    selectedLayer,
+    selectLayer,
+  } = mapState;
 
   return (
     <div class={styles.container}>
@@ -23,32 +24,32 @@ export const MapLayers = (props: MapLayersProps) => {
         <button
           style={{ "grid-area": "up" }}
           class={styles.headerButton}
-          onClick={() =>
-            moveLayerUp(
-              currentLayers().find((layer) => layer.Selected)?.ID ?? "-1"
-            )
-          }
+          onClick={() => {
+            const currentSelectedLayer = selectedLayer();
+            moveLayerUp(currentSelectedLayer);
+            selectLayer(currentSelectedLayer);
+          }}
         >
           <AiOutlineUp size={16} fill="white" />
         </button>
         <button
           style={{ "grid-area": "down" }}
           class={styles.headerButton}
-          onClick={() =>
-            moveLayerDown(
-              currentLayers().find((layer) => layer.Selected)?.ID ?? "-1"
-            )
-          }
+          onClick={() => {
+            const currentSelectedLayer = selectedLayer();
+            moveLayerDown(currentSelectedLayer);
+            selectLayer(currentSelectedLayer);
+          }}
         >
           <AiOutlineDown size={16} fill="white" />
         </button>
       </div>
       <div class={styles.layersWrapper}>
-        <For each={currentLayers()}>
+        <For each={[...currentLayers()].reverse()}>
           {(item) => {
             return (
               <div class={styles.layerItem}>
-                <Show when={item.Selected}>
+                <Show when={item.ID === selectedLayer()}>
                   <AiOutlineCheckCircle size={18} fill="white" />
                 </Show>
                 Layer {Number(item.ID) + 1}

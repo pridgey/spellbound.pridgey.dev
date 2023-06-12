@@ -2,6 +2,8 @@ import { createEffect, createRoot, createSignal } from "solid-js";
 import { GameItem } from "~/types";
 
 const createMapState = () => {
+  // Selected Layer
+  const [selectedLayer, setSelectLayer] = createSignal("");
   // Map Layer State
   const [currentLayers, setCurrentLayers] = createSignal<GameItem[]>([
     {
@@ -12,7 +14,6 @@ const createMapState = () => {
       Layer: 0,
       Left: 0,
       Rotation: 0,
-      Selected: false,
       Top: 0,
       Width: 200,
     },
@@ -24,7 +25,6 @@ const createMapState = () => {
       Layer: 1,
       Left: 50,
       Rotation: 0,
-      Selected: false,
       Top: 50,
       Width: 200,
     },
@@ -36,7 +36,6 @@ const createMapState = () => {
       Layer: 2,
       Left: 100,
       Rotation: 0,
-      Selected: false,
       Top: 100,
       Width: 200,
     },
@@ -48,11 +47,14 @@ const createMapState = () => {
       Layer: 2,
       Left: 200,
       Rotation: 0,
-      Selected: false,
       Top: 200,
       Width: 200,
     },
   ]);
+
+  createEffect(() => {
+    console.log("Selected:", { selectedLayer: selectedLayer() });
+  });
 
   // ----- Actions in the store -----
 
@@ -69,10 +71,6 @@ const createMapState = () => {
         const hold = current[layerIndex + 1];
         current[layerIndex + 1] = current[layerIndex];
         current[layerIndex] = hold;
-        current.forEach((layer) => {
-          layer.Selected = false;
-        });
-        current[layerIndex + 1].Selected = true;
       }
 
       return [...current];
@@ -92,10 +90,6 @@ const createMapState = () => {
         const hold = current[layerIndex - 1];
         current[layerIndex - 1] = current[layerIndex];
         current[layerIndex] = hold;
-        current.forEach((layer) => {
-          layer.Selected = false;
-        });
-        current[layerIndex - 1].Selected = true;
       }
 
       return [...current];
@@ -145,29 +139,14 @@ const createMapState = () => {
     });
   };
 
-  /**
-   * Selects specified layer, unselecting all others
-   * @param id The id of the layer to select
-   */
-  const selectLayer = (id: string) => {
-    const layers = [...currentLayers()];
-    layers.forEach((layer) => {
-      layer.Selected = false;
-    });
-
-    const newSelectedLayer = layers.find((layer) => layer.ID === id);
-    if (newSelectedLayer) newSelectedLayer.Selected = true;
-
-    setCurrentLayers([...layers]);
-  };
-
   // Return all the stuff from the store
   return {
     currentLayers,
     getLayer,
     setLayer,
     setLayerByID,
-    selectLayer,
+    selectLayer: setSelectLayer,
+    selectedLayer,
     moveLayerUp,
     moveLayerDown,
   };

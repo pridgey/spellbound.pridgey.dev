@@ -1,0 +1,148 @@
+.resizable {
+  display: var(--resize-display);
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  background-color: white;
+  user-select: none;
+  z-index: 2;
+}
+
+.frame {
+  position: absolute;
+  width: var(--frame-width);
+  height: var(--frame-height);
+  left: var(--frame-left);
+  top: var(--frame-top);
+  user-select: none;
+  cursor: move;
+}
+
+.item {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  cursor: move;
+  rotate: var(--item-rotate);
+  border: 0px;
+}
+
+.rotation {
+  display: var(--rotate-display);
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  bottom: 20px;
+  right: 20px;
+  background-image: url("/images/rotate.svg");
+  background-size: 50%;
+  background-position: center;
+  border-radius: 100%;
+  background-repeat: no-repeat;
+  cursor: url("/images/rotate.svg"), auto;
+  z-index: 3;
+}
+
+/* Toolbar styling */
+.toolbar {
+  display: var(--toolbar-display);
+  position: absolute;
+  height: 30px;
+  background-color: white;
+  bottom: 20px;
+  right: 70px;
+  flex-direction: row;
+  border-radius: 2rem;
+  overflow: hidden;
+  z-index: 3;
+}
+
+/* Toolbar button styling */
+.toolbar button {
+  width: 30px;
+  border: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: white;
+  color: black;
+}
+
+.toolbar_button {
+  font-size: 2rem;
+}
+
+.toolbar > button > svg {
+  width: 2rem;
+  height: 2rem;
+  font-size: 2rem;
+}
+
+/* The hover effect of the toolbar's buttons */
+.toolbar button:hover {
+  background-color: #ecebeb;
+}
+
+.selection {
+  display: var(--selection-display);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid white;
+  z-index: 2;
+  user-select: none;
+}
+
+/* Removes the outline that comes from holding shift */
+.frame:focus-visible,
+.item:focus-visible {
+  outline: 0px;
+}
+
+/* Shows a border around the item frame */
+.frame:focus-within {
+  border: 0px solid white;
+  outline: 0px;
+}
+
+/* Show toolbar when item frame is focused */
+.frame:focus-within .toolbar {
+  display: flex;
+}
+
+/* Show scale handles and rotation handle when item frame is focused */
+.frame:focus-within .resizable,
+.frame:focus-within .rotation,
+.frame:focus-within .selection {
+  display: block;
+}
+
+.topLeft {
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+
+.topRight {
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.bottomLeft {
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
+.bottomRight {
+  bottom: -5px;
+  right: -5px;
+  cursor: nwse-resize;
+}

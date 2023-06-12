@@ -1,5 +1,4 @@
 import { onCleanup, onMount, Switch, Match } from "solid-js";
-import { css } from "solid-styled";
 import { useDraggable, useResizable, useRotatable } from "~/utilities";
 import { GameItem } from "~/types";
 import mapState from "~/state/mapState";
@@ -9,6 +8,7 @@ import {
   AiOutlineExpand,
   AiOutlineUp,
 } from "solid-icons/ai";
+import styles from "./EditorItem.module.css";
 
 export type EditorItemProps = {
   Container: HTMLElement;
@@ -16,161 +16,14 @@ export type EditorItemProps = {
 };
 
 export const EditorItem = (props: EditorItemProps) => {
-  css`
-    .resizable {
-      display: none;
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      border-radius: 100%;
-      background-color: white;
-      user-select: none;
-      z-index: 2;
-    }
-
-    .frame {
-      position: absolute;
-      width: ${props.Item.Fullscreen ? "100%" : `${props.Item.Width}px`};
-      height: ${props.Item.Fullscreen ? "100%" : `${props.Item.Height}px`};
-      left: ${props.Item.Fullscreen
-        ? "0px"
-        : `${props.Item.Left.toString()}px`};
-      top: ${props.Item.Fullscreen ? "0px" : `${props.Item.Top.toString()}px`};
-      user-select: none;
-      cursor: move;
-    }
-
-    .item {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      user-select: none;
-      cursor: move;
-      rotate: ${`${props.Item.Rotation.toString() ?? 0}deg`};
-      border: 0px;
-    }
-
-    .rotation {
-      display: none;
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background-color: white;
-      bottom: 20px;
-      right: 20px;
-      background-image: url("/images/rotate.svg");
-      background-size: 50%;
-      background-position: center;
-      border-radius: 100%;
-      background-repeat: no-repeat;
-      cursor: url("/images/rotate.svg"), auto;
-      z-index: 3;
-    }
-
-    /* Toolbar styling */
-    .toolbar {
-      display: none;
-      position: absolute;
-      height: 30px;
-      background-color: white;
-      bottom: 20px;
-      right: 70px;
-      flex-direction: row;
-      border-radius: 2rem;
-      overflow: hidden;
-      z-index: 3;
-    }
-
-    /* Toolbar button styling */
-    .toolbar button {
-      width: 30px;
-      border: 0px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background-color: white;
-      color: black;
-    }
-
-    .toolbar_button {
-      font-size: 2rem;
-    }
-
-    .toolbar > button > svg {
-      width: 2rem;
-      height: 2rem;
-      font-size: 2rem;
-    }
-
-    /* The hover effect of the toolbar's buttons */
-    .toolbar button:hover {
-      background-color: #ecebeb;
-    }
-
-    .selection {
-      display: none;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      height: 100%;
-      border: 1px dashed white;
-      z-index: 2;
-      user-select: none;
-    }
-
-    /* Removes the outline that comes from holding shift */
-    .frame:focus-visible,
-    .item:focus-visible {
-      outline: 0px;
-    }
-
-    /* Shows a border around the item frame */
-    .frame:focus-within {
-      border: 0px solid white;
-      outline: 0px;
-    }
-
-    /* Show toolbar when item frame is focused */
-    .frame:focus-within .toolbar {
-      display: flex;
-    }
-
-    /* Show scale handles and rotation handle when item frame is focused */
-    .frame:focus-within .resizable,
-    .frame:focus-within .rotation,
-    .frame:focus-within .selection {
-      display: block;
-    }
-
-    .top-left {
-      top: -5px;
-      left: -5px;
-      cursor: nwse-resize;
-    }
-
-    .top-right {
-      top: -5px;
-      right: -5px;
-      cursor: nesw-resize;
-    }
-
-    .bottom-left {
-      bottom: -5px;
-      left: -5px;
-      cursor: nesw-resize;
-    }
-
-    .bottom-right {
-      bottom: -5px;
-      right: -5px;
-      cursor: nwse-resize;
-    }
-  `;
-
   // Current map layer stateful actions
-  const { setLayerByID, moveLayerUp, moveLayerDown, selectLayer } = mapState;
+  const {
+    selectedLayer,
+    setLayerByID,
+    moveLayerUp,
+    moveLayerDown,
+    selectLayer,
+  } = mapState;
 
   // References to the element and its frame
   let frameRef: HTMLElement;
@@ -186,12 +39,12 @@ export const EditorItem = (props: EditorItemProps) => {
     useDraggable(frameRef!, props.Container, {
       OnDragEnd: (x, y) => {
         if (x !== props.Item.Left || y !== props.Item.Top) {
+          selectLayer(props.Item.ID);
           setLayerByID(props.Item.ID, {
             ...props.Item,
             Left: x,
             Top: y,
           });
-          selectLayer(props.Item.ID);
         }
       },
     });
@@ -201,11 +54,11 @@ export const EditorItem = (props: EditorItemProps) => {
     useRotatable({
       OnRotateEnd: (newRotation) => {
         if (newRotation !== props.Item.Rotation) {
+          selectLayer(props.Item.ID);
           setLayerByID(props.Item.ID, {
             ...props.Item,
             Rotation: newRotation,
           });
-          selectLayer(props.Item.ID);
         }
       },
       ShiftAngleInterval: 15,
@@ -215,6 +68,7 @@ export const EditorItem = (props: EditorItemProps) => {
   const { subscribe: subscribeResizable, unsubscribe: unsubscribeResizable } =
     useResizable({
       OnResizeEnd: (width, height, left, top) => {
+        selectLayer(props.Item.ID);
         setLayerByID(props.Item.ID, {
           ...props.Item,
           Left: left,
@@ -222,7 +76,6 @@ export const EditorItem = (props: EditorItemProps) => {
           Width: width,
           Height: height,
         });
-        selectLayer(props.Item.ID);
       },
       MinimumSize: 100,
     });
@@ -246,7 +99,7 @@ export const EditorItem = (props: EditorItemProps) => {
     );
 
     // Focus element if selected
-    if (props.Item.Selected) {
+    if (props.Item.ID === selectedLayer()) {
       itemRef?.focus();
     }
   });
@@ -264,31 +117,92 @@ export const EditorItem = (props: EditorItemProps) => {
   });
 
   const ItemFrame = (props: any) => (
-    <div tabindex={0} class="frame" ref={frameRef! as HTMLDivElement}>
+    <div
+      tabindex={0}
+      onClick={() => selectLayer(props.Item.ID)}
+      class={styles.frame}
+      style={{
+        "--frame-width": props.Item.Fullscreen
+          ? "100%"
+          : `${props.Item.Width}px`,
+        "--frame-height": props.Item.Fullscreen
+          ? "100%"
+          : `${props.Item.Height}px`,
+        "--frame-left": props.Item.Fullscreen ? "0px" : `${props.Item.Left}px`,
+        "--frame-top": props.Item.Fullscreen ? "0px" : `${props.Item.Top}px`,
+      }}
+      ref={frameRef! as HTMLDivElement}
+    >
       {props.children}
     </div>
   );
 
+  // Returns the value for the CSS Display property depending on if element is considered selected
+  const selectedDisplayProperty =
+    props.Item.ID === selectedLayer() ? "block" : "none";
+  const toolbarDisplayProperty =
+    props.Item.ID === selectedLayer() ? "flex" : "none";
+
   return (
     <ItemFrame Item={props.Item}>
       <button
-        autofocus={props.Item.Selected}
+        autofocus={props.Item.ID === selectedLayer()}
         tabIndex={0}
         style={{
           "background-image": `url("${props.Item.ImageURL}")`,
           "background-size": "cover",
+          "--item-rotate": `${props.Item.Rotation ?? "0"}deg`,
         }}
-        class="item"
+        class={styles.item}
         ref={itemRef! as HTMLButtonElement}
       ></button>
       {/* Render each of the four scaling handles */}
-      <div ref={resizeTLRef!} class="resizable top-left"></div>
-      <div ref={resizeTRRef!} class="resizable top-right"></div>
-      <div ref={resizeBLRef!} class="resizable bottom-left"></div>
-      <div ref={resizeBRRef!} class="resizable bottom-right"></div>
+      <div
+        ref={resizeTLRef!}
+        classList={{
+          [styles.resizable]: true,
+          [styles.topLeft]: true,
+        }}
+        style={{
+          "--resize-display": selectedDisplayProperty,
+        }}
+      ></div>
+      <div
+        ref={resizeTRRef!}
+        classList={{
+          [styles.resizable]: true,
+          [styles.topRight]: true,
+        }}
+        style={{
+          "--resize-display": selectedDisplayProperty,
+        }}
+      ></div>
+      <div
+        ref={resizeBLRef!}
+        classList={{
+          [styles.resizable]: true,
+          [styles.bottomLeft]: true,
+        }}
+        style={{
+          "--resize-display": selectedDisplayProperty,
+        }}
+      ></div>
+      <div
+        ref={resizeBRRef!}
+        classList={{
+          [styles.resizable]: true,
+          [styles.bottomRight]: true,
+        }}
+        style={{
+          "--resize-display": selectedDisplayProperty,
+        }}
+      ></div>
 
       {/* Toolbar of quick actions */}
-      <div class="toolbar">
+      <div
+        class={styles.toolbar}
+        style={{ "--toolbar-display": toolbarDisplayProperty }}
+      >
         <button
           id="full-screen"
           onClick={() => {
@@ -296,7 +210,8 @@ export const EditorItem = (props: EditorItemProps) => {
             setLayerByID(props.Item.ID, {
               ...props.Item,
               Fullscreen: !props.Item.Fullscreen,
-            } as unknown as GameItem);
+            });
+            selectLayer(props.Item.ID);
           }}
         >
           <Switch>
@@ -308,17 +223,40 @@ export const EditorItem = (props: EditorItemProps) => {
             </Match>
           </Switch>
         </button>
-        <button id="layer-down" onClick={() => moveLayerDown(props.Item.ID)}>
+        <button
+          id="layer-down"
+          onClick={() => {
+            moveLayerDown(props.Item.ID);
+            selectLayer(props.Item.ID);
+          }}
+        >
           <AiOutlineDown size={12} />
         </button>
-        <button id="layer-up" onClick={() => moveLayerUp(props.Item.ID)}>
+        <button
+          id="layer-up"
+          onClick={() => {
+            moveLayerUp(props.Item.ID);
+            selectLayer(props.Item.ID);
+          }}
+        >
           <AiOutlineUp size={12} />
         </button>
       </div>
       {/* Icon handle for rotating the item */}
-      <div class="rotation" ref={rotationHandleRef! as HTMLDivElement}></div>
+      <div
+        class={styles.rotation}
+        ref={rotationHandleRef! as HTMLDivElement}
+        style={{
+          "--rotate-display": selectedDisplayProperty,
+        }}
+      ></div>
       {/* The outline around the frame when selected, shows through layers above */}
-      <div class="selection"></div>
+      <div
+        class={styles.selection}
+        style={{
+          "--selection-display": selectedDisplayProperty,
+        }}
+      ></div>
     </ItemFrame>
   );
 };

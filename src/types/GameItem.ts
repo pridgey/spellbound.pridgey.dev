@@ -6,7 +6,6 @@ export type GameItem = {
   Layer: number;
   Left: number;
   Rotation: number;
-  Selected: boolean;
   Top: number;
   Width: number;
 };
