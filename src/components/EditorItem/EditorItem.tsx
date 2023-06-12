@@ -1,4 +1,4 @@
-import { onCleanup, onMount, Switch, Match } from "solid-js";
+import { onCleanup, onMount, Switch, Match, createMemo } from "solid-js";
 import { useDraggable, useResizable, useRotatable } from "~/utilities";
 import { GameItem } from "~/types";
 import mapState from "~/state/mapState";
@@ -138,10 +138,14 @@ export const EditorItem = (props: EditorItemProps) => {
   );
 
   // Returns the value for the CSS Display property depending on if element is considered selected
-  const selectedDisplayProperty =
-    props.Item.ID === selectedLayer() ? "block" : "none";
-  const toolbarDisplayProperty =
-    props.Item.ID === selectedLayer() ? "flex" : "none";
+  const selectedDisplayProperty = createMemo(() =>
+    props.Item.ID === selectedLayer() ? "block" : "none"
+  );
+  const toolbarDisplayProperty = createMemo(() =>
+    props.Item.ID === selectedLayer() ? "flex" : "none"
+  );
+
+  console.log({ selectedDisplayProperty, toolbarDisplayProperty });
 
   return (
     <ItemFrame Item={props.Item}>
@@ -164,7 +168,7 @@ export const EditorItem = (props: EditorItemProps) => {
           [styles.topLeft]: true,
         }}
         style={{
-          "--resize-display": selectedDisplayProperty,
+          "--resize-display": selectedDisplayProperty(),
         }}
       ></div>
       <div
@@ -174,7 +178,7 @@ export const EditorItem = (props: EditorItemProps) => {
           [styles.topRight]: true,
         }}
         style={{
-          "--resize-display": selectedDisplayProperty,
+          "--resize-display": selectedDisplayProperty(),
         }}
       ></div>
       <div
@@ -184,7 +188,7 @@ export const EditorItem = (props: EditorItemProps) => {
           [styles.bottomLeft]: true,
         }}
         style={{
-          "--resize-display": selectedDisplayProperty,
+          "--resize-display": selectedDisplayProperty(),
         }}
       ></div>
       <div
@@ -194,14 +198,14 @@ export const EditorItem = (props: EditorItemProps) => {
           [styles.bottomRight]: true,
         }}
         style={{
-          "--resize-display": selectedDisplayProperty,
+          "--resize-display": selectedDisplayProperty(),
         }}
       ></div>
 
       {/* Toolbar of quick actions */}
       <div
         class={styles.toolbar}
-        style={{ "--toolbar-display": toolbarDisplayProperty }}
+        style={{ "--toolbar-display": toolbarDisplayProperty() }}
       >
         <button
           id="full-screen"
@@ -247,14 +251,14 @@ export const EditorItem = (props: EditorItemProps) => {
         class={styles.rotation}
         ref={rotationHandleRef! as HTMLDivElement}
         style={{
-          "--rotate-display": selectedDisplayProperty,
+          "--rotate-display": selectedDisplayProperty(),
         }}
       ></div>
       {/* The outline around the frame when selected, shows through layers above */}
       <div
         class={styles.selection}
         style={{
-          "--selection-display": selectedDisplayProperty,
+          "--selection-display": selectedDisplayProperty(),
         }}
       ></div>
     </ItemFrame>

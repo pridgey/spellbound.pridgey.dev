@@ -40,13 +40,14 @@ export const EditorScreen = (props: EditorScreenProps) => {
 
   let ContainerRef: HTMLDivElement;
 
-  const { currentLayers } = mapState;
+  const { currentLayers, selectLayer } = mapState;
 
   return (
     <div
       class="screen"
       id="editor-screen"
       ref={ContainerRef! as HTMLDivElement}
+      onClick={() => selectLayer("")}
     >
       <For each={currentLayers()}>
         {(item) => <EditorItem Container={ContainerRef} Item={item} />}
