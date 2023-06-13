@@ -52,10 +52,6 @@ const createMapState = () => {
     },
   ]);
 
-  createEffect(() => {
-    console.log("Selected:", { selectedLayer: selectedLayer() });
-  });
-
   // ----- Actions in the store -----
 
   /**

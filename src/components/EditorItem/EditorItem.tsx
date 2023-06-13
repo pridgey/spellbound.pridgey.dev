@@ -119,7 +119,11 @@ export const EditorItem = (props: EditorItemProps) => {
   const ItemFrame = (props: any) => (
     <div
       tabindex={0}
-      onClick={() => selectLayer(props.Item.ID)}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        selectLayer(props.Item.ID);
+      }}
+      onClick={(e) => e.stopPropagation()}
       class={styles.frame}
       style={{
         "--frame-width": props.Item.Fullscreen
@@ -144,8 +148,6 @@ export const EditorItem = (props: EditorItemProps) => {
   const toolbarDisplayProperty = createMemo(() =>
     props.Item.ID === selectedLayer() ? "flex" : "none"
   );
-
-  console.log({ selectedDisplayProperty, toolbarDisplayProperty });
 
   return (
     <ItemFrame Item={props.Item}>

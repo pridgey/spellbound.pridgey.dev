@@ -1,12 +1,12 @@
 .resizable {
   display: var(--resize-display);
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 100%;
   background-color: white;
   user-select: none;
-  z-index: 2;
+  z-index: 3;
 }
 
 .frame {
@@ -124,25 +124,25 @@
 }
 
 .topLeft {
-  top: -5px;
-  left: -5px;
+  top: -4px;
+  left: -4px;
   cursor: nwse-resize;
 }
 
 .topRight {
-  top: -5px;
-  right: -5px;
+  top: -4px;
+  right: -4px;
   cursor: nesw-resize;
 }
 
 .bottomLeft {
-  bottom: -5px;
-  left: -5px;
+  bottom: -4px;
+  left: -4px;
   cursor: nesw-resize;
 }
 
 .bottomRight {
-  bottom: -5px;
-  right: -5px;
+  bottom: -4px;
+  right: -4px;
   cursor: nwse-resize;
 }
