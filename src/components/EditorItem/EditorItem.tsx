@@ -1,4 +1,4 @@
-import { onCleanup, onMount, Switch, Match, createMemo } from "solid-js";
+import { onCleanup, onMount, Show, Switch, Match, createMemo } from "solid-js";
 import { useDraggable, useResizable, useRotatable } from "~/utilities";
 import { GameItem } from "~/types";
 import mapState from "~/state/mapState";
@@ -6,6 +6,8 @@ import {
   AiOutlineCompress,
   AiOutlineDown,
   AiOutlineExpand,
+  AiOutlineLock,
+  AiOutlineUnlock,
   AiOutlineUp,
 } from "solid-icons/ai";
 import styles from "./EditorItem.module.css";
@@ -18,11 +20,14 @@ export type EditorItemProps = {
 export const EditorItem = (props: EditorItemProps) => {
   // Current map layer stateful actions
   const {
+    getLayer,
     selectedLayer,
     setLayerByID,
+    lockLayer,
     moveLayerUp,
     moveLayerDown,
     selectLayer,
+    unlockLayer,
   } = mapState;
 
   // References to the element and its frame
@@ -116,9 +121,16 @@ export const EditorItem = (props: EditorItemProps) => {
     unsubscribeResizable();
   });
 
+  const isLocked = createMemo(() => {
+    const layer = getLayer(props.Item.ID);
+
+    return layer?.Locked;
+  });
+
   const ItemFrame = (props: any) => (
     <div
       tabindex={0}
+      data-locked={isLocked()}
       onMouseDown={(e) => {
         e.stopPropagation();
         selectLayer(props.Item.ID);
@@ -153,6 +165,7 @@ export const EditorItem = (props: EditorItemProps) => {
     <ItemFrame Item={props.Item}>
       <button
         autofocus={props.Item.ID === selectedLayer()}
+        data-locked={isLocked()}
         tabIndex={0}
         style={{
           "background-image": `url("${props.Item.ImageURL}")`,
@@ -163,99 +176,125 @@ export const EditorItem = (props: EditorItemProps) => {
         ref={itemRef! as HTMLButtonElement}
       ></button>
       {/* Render each of the four scaling handles */}
-      <div
-        ref={resizeTLRef!}
-        classList={{
-          [styles.resizable]: true,
-          [styles.topLeft]: true,
-        }}
-        style={{
-          "--resize-display": selectedDisplayProperty(),
-        }}
-      ></div>
-      <div
-        ref={resizeTRRef!}
-        classList={{
-          [styles.resizable]: true,
-          [styles.topRight]: true,
-        }}
-        style={{
-          "--resize-display": selectedDisplayProperty(),
-        }}
-      ></div>
-      <div
-        ref={resizeBLRef!}
-        classList={{
-          [styles.resizable]: true,
-          [styles.bottomLeft]: true,
-        }}
-        style={{
-          "--resize-display": selectedDisplayProperty(),
-        }}
-      ></div>
-      <div
-        ref={resizeBRRef!}
-        classList={{
-          [styles.resizable]: true,
-          [styles.bottomRight]: true,
-        }}
-        style={{
-          "--resize-display": selectedDisplayProperty(),
-        }}
-      ></div>
+      <Show when={!isLocked()}>
+        <div
+          ref={resizeTLRef!}
+          classList={{
+            [styles.resizable]: true,
+            [styles.topLeft]: true,
+          }}
+          style={{
+            "--resize-display": selectedDisplayProperty(),
+          }}
+        ></div>
+        <div
+          ref={resizeTRRef!}
+          classList={{
+            [styles.resizable]: true,
+            [styles.topRight]: true,
+          }}
+          style={{
+            "--resize-display": selectedDisplayProperty(),
+          }}
+        ></div>
+        <div
+          ref={resizeBLRef!}
+          classList={{
+            [styles.resizable]: true,
+            [styles.bottomLeft]: true,
+          }}
+          style={{
+            "--resize-display": selectedDisplayProperty(),
+          }}
+        ></div>
+        <div
+          ref={resizeBRRef!}
+          classList={{
+            [styles.resizable]: true,
+            [styles.bottomRight]: true,
+          }}
+          style={{
+            "--resize-display": selectedDisplayProperty(),
+          }}
+        ></div>
+      </Show>
 
       {/* Toolbar of quick actions */}
       <div
         class={styles.toolbar}
         style={{ "--toolbar-display": toolbarDisplayProperty() }}
       >
+        <Show when={!isLocked()}>
+          <button
+            id="full-screen"
+            onClick={() => {
+              // Set layer to full-screen
+              setLayerByID(props.Item.ID, {
+                ...props.Item,
+                Fullscreen: !props.Item.Fullscreen,
+              });
+              selectLayer(props.Item.ID);
+            }}
+          >
+            <Switch>
+              <Match when={props.Item.Fullscreen}>
+                <AiOutlineCompress size={12} />
+              </Match>
+              <Match when={!props.Item.Fullscreen}>
+                <AiOutlineExpand size={12} />
+              </Match>
+            </Switch>
+          </button>
+          <button
+            id="layer-down"
+            onClick={() => {
+              moveLayerDown(props.Item.ID);
+              selectLayer(props.Item.ID);
+            }}
+          >
+            <AiOutlineDown size={12} />
+          </button>
+          <button
+            id="layer-up"
+            onClick={() => {
+              moveLayerUp(props.Item.ID);
+              selectLayer(props.Item.ID);
+            }}
+          >
+            <AiOutlineUp size={12} />
+          </button>
+        </Show>
         <button
-          id="full-screen"
+          id="lock-unlock"
           onClick={() => {
-            // Set layer to full-screen
-            setLayerByID(props.Item.ID, {
-              ...props.Item,
-              Fullscreen: !props.Item.Fullscreen,
-            });
-            selectLayer(props.Item.ID);
+            console.log("Click lock");
+            if (props.Item.Locked) {
+              unlockLayer(props.Item.ID);
+            } else {
+              lockLayer(props.Item.ID);
+            }
           }}
         >
           <Switch>
-            <Match when={props.Item.Fullscreen}>
-              <AiOutlineCompress size={12} />
+            <Match when={isLocked()}>
+              <AiOutlineUnlock />
             </Match>
-            <Match when={!props.Item.Fullscreen}>
-              <AiOutlineExpand size={12} />
+            <Match when={!isLocked()}>
+              <AiOutlineLock />
             </Match>
           </Switch>
         </button>
-        <button
-          id="layer-down"
-          onClick={() => {
-            moveLayerDown(props.Item.ID);
-            selectLayer(props.Item.ID);
-          }}
-        >
-          <AiOutlineDown size={12} />
-        </button>
-        <button
-          id="layer-up"
-          onClick={() => {
-            moveLayerUp(props.Item.ID);
-            selectLayer(props.Item.ID);
-          }}
-        >
-          <AiOutlineUp size={12} />
-        </button>
       </div>
       {/* Icon handle for rotating the item */}
-      <div
-        class={styles.rotation}
-        ref={rotationHandleRef! as HTMLDivElement}
-        style={{
-          "--rotate-display": selectedDisplayProperty(),
-        }}
-      ></div>
+      <Show when={!isLocked()}>
+        <div
+          class={styles.rotation}
+          ref={rotationHandleRef! as HTMLDivElement}
+          style={{
+            "--rotate-display": selectedDisplayProperty(),
+          }}
+        ></div>
+      </Show>
       {/* The outline around the frame when selected, shows through layers above */}
       <div
         class={styles.selection}

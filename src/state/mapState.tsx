@@ -13,6 +13,7 @@ const createMapState = () => {
       ImageURL: "images/sample-1.png",
       Layer: 0,
       Left: 0,
+      Locked: false,
       Rotation: 0,
       Top: 0,
       Width: 200,
@@ -24,6 +25,7 @@ const createMapState = () => {
       ImageURL: "images/sample-2.png",
       Layer: 1,
       Left: 50,
+      Locked: false,
       Rotation: 0,
       Top: 50,
       Width: 200,
@@ -35,6 +37,7 @@ const createMapState = () => {
       ImageURL: "images/sample-3.png",
       Layer: 2,
       Left: 100,
+      Locked: false,
       Rotation: 0,
       Top: 100,
       Width: 200,
@@ -46,6 +49,7 @@ const createMapState = () => {
       ImageURL: "images/sample-4.png",
       Layer: 2,
       Left: 200,
+      Locked: false,
       Rotation: 0,
       Top: 200,
       Width: 200,
@@ -63,7 +67,7 @@ const createMapState = () => {
       const layerIndex = current.findIndex((layer) => layer.ID === layerId);
 
       // Only do so if it isn't the last item in the array
-      if (layerIndex < current.length - 1) {
+      if (!current[layerIndex].Locked && layerIndex < current.length - 1) {
         const hold = current[layerIndex + 1];
         current[layerIndex + 1] = current[layerIndex];
         current[layerIndex] = hold;
@@ -82,7 +86,7 @@ const createMapState = () => {
       const layerIndex = current.findIndex((layer) => layer.ID === layerId);
 
       // Only do so if it isn't the last item in the array
-      if (layerIndex > 0) {
+      if (!current[layerIndex].Locked && layerIndex > 0) {
         const hold = current[layerIndex - 1];
         current[layerIndex - 1] = current[layerIndex];
         current[layerIndex] = hold;
@@ -97,23 +101,10 @@ const createMapState = () => {
    * @param index The index to return
    * @returns The item at the specified index
    */
-  const getLayer = (index: number) => currentLayers()[index];
+  const getLayer = (id: string) => {
+    const layer = currentLayers().find((layer) => layer.ID === id);
 
-  /**
-   * Updates the map layer item in state by index
-   * @param index The index of the map layer item to update
-   * @param newValue The new value data for the map layer item
-   */
-  const setLayer = (index: number, newValue: GameItem) => {
-    // Update state, use index to find item in array
-    setCurrentLayers((prevState) => {
-      // Update this index with new value
-      prevState[index] = {
-        ...newValue,
-      };
-
-      return [...prevState];
-    });
+    return layer;
   };
 
   /**
@@ -125,7 +116,7 @@ const createMapState = () => {
     setCurrentLayers((prev) => {
       const layerIndex = prev.findIndex((layer) => layer.ID === id);
 
-      if (layerIndex > -1) {
+      if (!prev[layerIndex].Locked && layerIndex > -1) {
         prev[layerIndex] = {
           ...newValue,
         };
@@ -135,16 +126,47 @@ const createMapState = () => {
     });
   };
 
+  /**
+   * Locks a layer of the map to prevent modification
+   * @param id The id of the map layer item to lock
+   */
+  const lockLayer = (id: string) => {
+    setCurrentLayers((prev) => {
+      const layerIndex = prev.findIndex((layer) => layer.ID === id);
+
+      console.log("Lock layer", { layerIndex });
+
+      prev[layerIndex].Locked = true;
+
+      return [...prev];
+    });
+  };
+
+  /**
+   * Locks a layer of the map to prevent modification
+   * @param id The id of the map layer item to lock
+   */
+  const unlockLayer = (id: string) => {
+    setCurrentLayers((prev) => {
+      const layerIndex = prev.findIndex((layer) => layer.ID === id);
+
+      prev[layerIndex].Locked = false;
+
+      return [...prev];
+    });
+  };
+
   // Return all the stuff from the store
   return {
     currentLayers,
     getLayer,
-    setLayer,
+    lockLayer,
+    moveLayerUp,
+    moveLayerDown,
     setLayerByID,
     selectLayer: setSelectLayer,
     selectedLayer,
-    moveLayerUp,
-    moveLayerDown,
+    unlockLayer,
   };
 };
 

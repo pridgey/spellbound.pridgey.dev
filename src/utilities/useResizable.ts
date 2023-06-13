@@ -135,6 +135,8 @@ export const useResizable = (options?: useResizableProps) => {
 
   // Event to handle mouse moving, causing resize
   const handleMouseMove = (e: MouseEvent) => {
+    // Check if layer is locked
+    if (element.getAttribute("data-locked") === "true") return;
     // Exit early if we aren't resizing
     if (!isResizing) return;
 

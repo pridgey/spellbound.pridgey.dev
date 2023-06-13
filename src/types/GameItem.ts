@@ -5,6 +5,7 @@ export type GameItem = {
   ImageURL: string;
   Layer: number;
   Left: number;
+  Locked: boolean;
   Rotation: number;
   Top: number;
   Width: number;

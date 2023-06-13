@@ -97,6 +97,8 @@ export const useRotatable = (options?: useRotatableProps) => {
 
   // Event to handle mouse moving, causing the rotation
   const handleMouseMove = (e: MouseEvent) => {
+    // Check if layer is locked
+    if (element.getAttribute("data-locked") === "true") return;
     // Exit early if we aren't rotating
     if (!isRotating) return;
 

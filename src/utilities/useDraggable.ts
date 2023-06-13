@@ -65,6 +65,8 @@ export const useDraggable = (
 
   // Event to handle when the mouse is being moved, aka the element is being dragged
   const handleMouseMove = (e: MouseEvent) => {
+    // Check if layer is locked
+    if (element.getAttribute("data-locked") === "true") return;
     // Exit early if we aren't dragging
     if (!dragging) return;
 
