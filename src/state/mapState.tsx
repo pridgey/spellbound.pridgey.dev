@@ -60,10 +60,10 @@ const createMapState = () => {
       ID: "4",
       ImageURL: "images/dragon.png",
       Layer: 2,
-      Left: 200,
+      Left: 500,
       Locked: false,
       Rotation: 0,
-      Top: 200,
+      Top: 500,
       Width: 200,
     },
   ]);
