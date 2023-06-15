@@ -56,7 +56,7 @@ const createMapState = () => {
     },
     {
       Fullscreen: false,
-      Height: 200,
+      Height: 100,
       ID: "4",
       ImageURL: "images/dragon.png",
       Layer: 2,
@@ -64,7 +64,7 @@ const createMapState = () => {
       Locked: false,
       Rotation: 0,
       Top: 200,
-      Width: 400,
+      Width: 200,
     },
   ]);
 
