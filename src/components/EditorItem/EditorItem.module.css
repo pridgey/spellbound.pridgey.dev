@@ -27,6 +27,7 @@
   cursor: move;
   rotate: var(--item-rotate);
   border: 0px;
+  background-color: transparent;
 }
 
 .rotation {
