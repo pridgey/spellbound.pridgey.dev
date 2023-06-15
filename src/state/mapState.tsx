@@ -54,6 +54,18 @@ const createMapState = () => {
       Top: 200,
       Width: 200,
     },
+    {
+      Fullscreen: false,
+      Height: 200,
+      ID: "4",
+      ImageURL: "images/dragon.png",
+      Layer: 2,
+      Left: 200,
+      Locked: false,
+      Rotation: 0,
+      Top: 200,
+      Width: 400,
+    },
   ]);
 
   // ----- Actions in the store -----
