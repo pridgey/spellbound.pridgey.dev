@@ -28,6 +28,8 @@
   rotate: var(--item-rotate);
   border: 0px;
   background-color: transparent;
+  background-repeat: var(--item-backgroundrepeat);
+  background-position: center;
 }
 
 .rotation {

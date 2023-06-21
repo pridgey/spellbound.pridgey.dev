@@ -1,4 +1,6 @@
 export type GameItem = {
+  BackgroundRepeat: boolean;
+  BackgroundSize: "cover" | "contain";
   Height: number;
   Fullscreen: boolean;
   ID: string;

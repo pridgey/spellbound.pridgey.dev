@@ -7,6 +7,8 @@ const createMapState = () => {
   // Map Layer State
   const [currentLayers, setCurrentLayers] = createSignal<GameItem[]>([
     {
+      BackgroundRepeat: false,
+      BackgroundSize: "cover",
       Fullscreen: false,
       Height: 200,
       ID: "0",
@@ -19,6 +21,8 @@ const createMapState = () => {
       Width: 200,
     },
     {
+      BackgroundRepeat: false,
+      BackgroundSize: "cover",
       Fullscreen: false,
       Height: 200,
       ID: "1",
@@ -31,6 +35,8 @@ const createMapState = () => {
       Width: 200,
     },
     {
+      BackgroundRepeat: false,
+      BackgroundSize: "cover",
       Fullscreen: false,
       Height: 200,
       ID: "2",
@@ -43,6 +49,8 @@ const createMapState = () => {
       Width: 200,
     },
     {
+      BackgroundRepeat: false,
+      BackgroundSize: "cover",
       Fullscreen: false,
       Height: 200,
       ID: "3",
@@ -55,6 +63,8 @@ const createMapState = () => {
       Width: 200,
     },
     {
+      BackgroundRepeat: false,
+      BackgroundSize: "cover",
       Fullscreen: false,
       Height: 100,
       ID: "4",

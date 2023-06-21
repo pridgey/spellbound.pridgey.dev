@@ -11,6 +11,7 @@ import {
   AiOutlineUp,
 } from "solid-icons/ai";
 import styles from "./EditorItem.module.css";
+import { TbArtboard, TbFrame, TbFrameOff } from "solid-icons/tb";
 
 export type EditorItemProps = {
   Container: HTMLElement;
@@ -127,6 +128,12 @@ export const EditorItem = (props: EditorItemProps) => {
     return layer?.Locked;
   });
 
+  const isFullscreen = createMemo(() => {
+    const layer = getLayer(props.Item.ID);
+
+    return layer?.Fullscreen;
+  });
+
   const ItemFrame = (props: any) => (
     <div
       tabindex={0}
@@ -138,14 +145,10 @@ export const EditorItem = (props: EditorItemProps) => {
       onClick={(e) => e.stopPropagation()}
       class={styles.frame}
       style={{
-        "--frame-width": props.Item.Fullscreen
-          ? "100%"
-          : `${props.Item.Width}px`,
-        "--frame-height": props.Item.Fullscreen
-          ? "100%"
-          : `${props.Item.Height}px`,
-        "--frame-left": props.Item.Fullscreen ? "0px" : `${props.Item.Left}px`,
-        "--frame-top": props.Item.Fullscreen ? "0px" : `${props.Item.Top}px`,
+        "--frame-width": isFullscreen() ? "100%" : `${props.Item.Width}px`,
+        "--frame-height": isFullscreen() ? "100%" : `${props.Item.Height}px`,
+        "--frame-left": isFullscreen() ? "0px" : `${props.Item.Left}px`,
+        "--frame-top": isFullscreen() ? "0px" : `${props.Item.Top}px`,
       }}
       ref={frameRef! as HTMLDivElement}
     >
@@ -169,14 +172,17 @@ export const EditorItem = (props: EditorItemProps) => {
         tabIndex={0}
         style={{
           "background-image": `url("${props.Item.ImageURL}")`,
-          "background-size": "cover",
+          "background-size": `${props.Item.BackgroundSize ?? "cover"}`,
           "--item-rotate": `${props.Item.Rotation ?? "0"}deg`,
+          "--item-backgroundrepeat": `${
+            props.Item.BackgroundRepeat ? "repeat" : "no-repeat"
+          }`,
         }}
         class={styles.item}
         ref={itemRef! as HTMLButtonElement}
       ></button>
       {/* Render each of the four scaling handles */}
-      <Show when={!isLocked()}>
+      <Show when={!isLocked() && !isFullscreen()}>
         <div
           ref={resizeTLRef!}
           classList={{
@@ -225,6 +231,43 @@ export const EditorItem = (props: EditorItemProps) => {
         style={{ "--toolbar-display": toolbarDisplayProperty() }}
       >
         <Show when={!isLocked()}>
+          <Show when={props.Item.BackgroundSize === "contain"}>
+            <button
+              id="repeat"
+              onClick={() => {
+                setLayerByID(props.Item.ID, {
+                  ...props.Item,
+                  BackgroundRepeat: !props.Item.BackgroundRepeat,
+                });
+              }}
+            >
+              <TbArtboard />
+            </button>
+          </Show>
+          <button
+            id="cover-contain"
+            onClick={() => {
+              // Toggle between coveṙ or contain mode
+              let backgroundSizeMode: "contain" | "cover" = "contain";
+              if (props.Item.BackgroundSize === "contain") {
+                backgroundSizeMode = "cover";
+              }
+              setLayerByID(props.Item.ID, {
+                ...props.Item,
+                BackgroundSize: backgroundSizeMode,
+              });
+            }}
+          >
+            <Switch>
+              <Match when={props.Item.BackgroundSize === "contain"}>
+                <TbFrame />
+              </Match>
+              <Match when={props.Item.BackgroundSize === "cover"}>
+                <TbFrameOff />
+              </Match>
+            </Switch>
+          </button>
+
           <button
             id="full-screen"
             onClick={() => {
@@ -237,10 +280,10 @@ export const EditorItem = (props: EditorItemProps) => {
             }}
           >
             <Switch>
-              <Match when={props.Item.Fullscreen}>
+              <Match when={isFullscreen()}>
                 <AiOutlineCompress size={12} />
               </Match>
-              <Match when={!props.Item.Fullscreen}>
+              <Match when={!isFullscreen()}>
                 <AiOutlineExpand size={12} />
               </Match>
             </Switch>
