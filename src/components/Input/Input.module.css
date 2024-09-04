@@ -1,0 +1,13 @@
+.input {
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #333;
+  color: black;
+  padding: 1em;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  text-align: center;
+  font-size: 1em;
+}

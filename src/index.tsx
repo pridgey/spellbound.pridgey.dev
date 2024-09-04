@@ -6,6 +6,7 @@ import "./index.css";
 
 const Home = lazy(() => import("./pages/home"));
 const Table = lazy(() => import("./pages/table"));
+const GM = lazy(() => import("./pages/gm"));
 
 const root = document.getElementById("root");
 
@@ -21,6 +22,8 @@ render(
       <Route path="/" component={Home} />
       <Route path="/table" component={Table} />
       <Route path="/table/:id" component={Table} />
+      <Route path="/gm" component={GM} />
+      <Route path="/gm/:id" component={GM} />
     </Router>
   ),
   root!

@@ -1,22 +1,9 @@
-import { redirect, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import PocketBase from "pocketbase";
 import { createSignal, Match, onMount, Switch } from "solid-js";
-
-const generateRandomCode = () => {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    code += characters[randomIndex];
-  }
-  return code;
-};
-
-type TableDataProps = {
-  mapUrl: string;
-  windowWidth?: number;
-  windowHeight?: number;
-};
+import styles from "./../styles/table.module.css";
+import { generateCode } from "../utilities/generateCode";
+import { TableDataProps } from "../types/TableDataProps";
 
 const Table = () => {
   // Create a new PocketBase client
@@ -31,7 +18,7 @@ const Table = () => {
   // Holds the tableData
   const [tableData, setTableData] = createSignal<TableDataProps>();
   // Gets the table code, or generates one if not found
-  const code = params.id || generateRandomCode();
+  const code = params.id || generateCode();
 
   // On mount check if there is a code in the params, if not generate one, then subscribe to data
   onMount(async () => {
@@ -68,15 +55,7 @@ const Table = () => {
   });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        "align-items": "center",
-        "justify-content": "center",
-        height: "100vh",
-        "font-size": "3rem",
-      }}
-    >
+    <main class={styles.main}>
       <Switch>
         <Match when={tableData()?.mapUrl?.length}>
           <img
@@ -84,13 +63,17 @@ const Table = () => {
             alt="Map"
             width={tableData()?.windowWidth}
             height={tableData()?.windowHeight}
+            style={{
+              "object-fit": "cover",
+              "object-position": "center",
+            }}
           />
         </Match>
         <Match when={!tableData()?.mapUrl?.length}>
           <h1>{code}</h1>
         </Match>
       </Switch>
-    </div>
+    </main>
   );
 };
 
